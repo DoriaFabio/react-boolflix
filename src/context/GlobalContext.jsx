@@ -1,4 +1,4 @@
-import { useContext, createContext, useState, useEffect } from "react";
+import { useContext, createContext, useState } from "react";
 import axios from "axios";
 
 //? Import apiUrl e apiKey dal file .env

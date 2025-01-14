@@ -1,6 +1,10 @@
-.mycard {
-    border: 3px solid green;
-    width: 150px;
-    height: 250px;
-    margin: 10px 0;
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+}
+
+.flag {
+    width: 70px;
 }

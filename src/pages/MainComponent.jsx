@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react"
+// import { useState, useEffect } from "react"
 import { useGlobalContext } from "../context/GlobalContext"
-import ListMedia from "../components/ListMedia"
+import ListMovies from "../components/ListMovies"
 
 function MainComponent() {
     const { movies } = useGlobalContext();
     console.log(movies);
     return (
-        <main className="container">
+        <main className="mycontainer py-5">
             {movies.length < 1 ? (
-                <div className="d-flex container h-100 align-items-center justify-content-center">
+                <div className="Nolist">
                     <h2>Prova a cercare un film o una serie tv!</h2>
                 </div>
             ) : (
                 <>
-                <ListMedia title="Movies" list={movies}/>
+                <ListMovies title="Movies" list={movies}/>
                 </>
             )}
         </main>
