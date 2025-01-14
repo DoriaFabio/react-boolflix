@@ -1,16 +1,16 @@
 // import { useState } from "react";
-import CardMovies from "./CardMovies"
+import CardSeries from "./CardSeries"
 //import Overlay from "./Overlay";
 
-export default function ListMovies({ title, list }) {
+export default function ListSeries({ name, list }) {
   //const [Overlay, setOverlay] = useState(false);
   return (
     <section>
-      <h3>{title}</h3>
+      <h3>{name}</h3>
       <div className="row gy-4">
         {list.map((media) => (
           <div className="col-12 col-md-4 col-lg-3" key={media.id}>
-            <CardMovies media={media}/>
+            <CardSeries media={media}/>
           </div>
         ))}
       </div>

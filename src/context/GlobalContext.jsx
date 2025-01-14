@@ -9,7 +9,7 @@ const GlobalContext = createContext();
 
 const GlobalProvider = ({ children }) => {
     const [movies, setMovies] = useState([]);
-    // const [series, setSeries] = useState([]);
+    const [series, setSeries] = useState([]);
 
     function getData(query) {
         axios.get(apiUrl + "search/movie", {
@@ -27,6 +27,21 @@ const GlobalProvider = ({ children }) => {
             .finally(() => {
                 console.log("Finito");
             })
+        axios.get(apiUrl + "search/tv", {
+            params: {
+                api_key: apiKey,
+                query,
+            },
+        }).then((res) => {
+            console.log(res.data);
+            setSeries(res.data.results);
+        })
+            .catch((error) => {
+                console.log(error);
+            })
+            .finally(() => {
+                console.log("Finito");
+            })
     }
 
     function search(query) {
@@ -34,6 +49,7 @@ const GlobalProvider = ({ children }) => {
     }
     const data = {
         movies,
+        series,
         search
     };
 

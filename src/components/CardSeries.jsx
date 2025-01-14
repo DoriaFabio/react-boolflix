@@ -11,10 +11,10 @@ export default function Card({ media }) {
     <div className="card">
       <img
         src={imgPath + media.poster_path}
-        alt={media.title}
+        alt={media.name}
       />
       <div className="card-body bg-dark">
-        <h5 className="card-title text-white">{media.title}</h5>
+        <h5 className="card-title text-white">{media.name}</h5>
         <p className="card-text text-white">{media.overview}</p>
         <div className="d-flex justify-content-center">
           <img src={`${flag}`} alt={flag} className={`${style.flag}`} />
@@ -22,7 +22,5 @@ export default function Card({ media }) {
         {/* <div className={style.cardStar}>{drawStars()}</div> */}
       </div>
     </div>
-
-
   )
 }

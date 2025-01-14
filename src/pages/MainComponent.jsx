@@ -1,10 +1,12 @@
 // import { useState, useEffect } from "react"
 import { useGlobalContext } from "../context/GlobalContext"
 import ListMovies from "../components/ListMovies"
+import ListSeries from "../components/ListSeries";
 
 function MainComponent() {
-    const { movies } = useGlobalContext();
+    const { movies, series } = useGlobalContext();
     console.log(movies);
+    console.log(series);
     return (
         <main className="mycontainer py-5">
             {movies.length < 1 ? (
@@ -14,6 +16,7 @@ function MainComponent() {
             ) : (
                 <>
                 <ListMovies title="Movies" list={movies}/>
+                <ListSeries name="tv" list={series}/>
                 </>
             )}
         </main>
