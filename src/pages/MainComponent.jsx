@@ -16,7 +16,7 @@ function MainComponent() {
             ) : (
                 <>
                 <ListMovies title="Movies" list={movies}/>
-                <ListSeries name="tv" list={series}/>
+                <ListSeries name="Serie tv" list={series}/>
                 </>
             )}
         </main>

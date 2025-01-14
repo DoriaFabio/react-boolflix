@@ -14,8 +14,9 @@ export default function Card({ media }) {
                 alt={media.name}
             />
             <div className={`${style.cardContent} card-body`}>
-                <h5 className="card-title text-white">{media.name}</h5>
-                <p className="card-text text-white">{media.overview}</p>
+                <h5 className="card-title text-white myfont1">Titolo originale: {media.original_name}</h5>
+                <h6 className="card-title text-white myfont">Titolo: {media.name}</h6>
+                <p className="card-text text-white myfont">{media.overview}</p>
                 <div className="d-flex justify-content-center">
                     <img src={`${flag}`} alt={flag} className={`${style.flag}`} />
                 </div>
