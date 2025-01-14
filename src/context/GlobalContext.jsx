@@ -12,7 +12,13 @@ const GlobalProvider = ({ children }) => {
     // const [series, setSeries] = useState([]);
 
     function getData(query) {
-        axios.get(apiUrl + "search/movie" + apiKey + query).then((res) => {
+        axios.get(apiUrl + "search/movie", {
+            params: {
+                api_key: apiKey,
+                query,
+            },
+        }).then((res) => {
+            console.log(res.data);
             setMovies(res.data.results);
         })
             .catch((error) => {
