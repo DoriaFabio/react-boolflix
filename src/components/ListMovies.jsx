@@ -1,11 +1,9 @@
 // import { useState } from "react";
 import CardMovies from "./CardMovies"
-//import Overlay from "./Overlay";
 
 export default function ListMovies({ title, list }) {
-  //const [Overlay, setOverlay] = useState(false);
   return (
-    <section>
+    <section className="my-4">
       <h3>{title}</h3>
       <div className="row gy-4">
         {list.map((media) => (
