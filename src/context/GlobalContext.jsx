@@ -2,8 +2,10 @@ import { useContext, createContext, useState, useEffect } from "react";
 import axios from "axios";
 
 //? Import apiUrl e apiKey dal file .env
-const apiUrl = import.meta.env.VITE_API_URL
-const apiKey = import.meta.env.VITE_API_KEY
+// const apiUrl = import.meta.env.VITE_API_URL
+// const apiKey = import.meta.env.VITE_API_KEY
+const apiKey = "cc3ab39c39766d9bbdfb7697ef7e22f1"
+const apiUrl = "https://api.themoviedb.org/3/"
 
 const GlobalContext = createContext();
 

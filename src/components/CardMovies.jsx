@@ -1,6 +1,7 @@
 // import { useState } from "react"
 import style from "./Card.module.css";
-const imgPath = import.meta.env.VITE_IMG_PATH;
+// const imgPath = import.meta.env.VITE_IMG_PATH;
+const imgPath = "https://image.tmdb.org/t/p/w342/"
 import {FaStar, FaRegStar} from "react-icons/fa"
 
 const flags = ["de", "en", "es", "it", "fr", "ja", "ko"];
