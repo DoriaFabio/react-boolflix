@@ -3,7 +3,7 @@ import style from "./Card.module.css";
 const imgPath = import.meta.env.VITE_IMG_PATH;
 import {FaStar, FaRegStar} from "react-icons/fa"
 
-const flags = ["de", "en", "es", "it", "fr", "ja"];
+const flags = ["de", "en", "es", "it", "fr", "ja", "ko"];
 export default function Card({ media }) {
   const flag = flags.includes(media.original_language)
     ? media.original_language + ".png"
@@ -32,10 +32,10 @@ export default function Card({ media }) {
         <h5 className="card-title text-white myfont1">Titolo originale: {media.original_title}</h5>
         <h6 className="card-title text-white myfont">Titolo: {media.title || media.name}</h6>
         <p className="card-text text-white myfont">{media.overview}</p>
-        <div className="d-flex justify-content-center">
+        <div className="d-flex flex-column align-items-center">
           <img src={`${flag}`} alt={flag} className={`${style.flag}`} />
+          <div className={style.cardStar}>{drawStars()}</div>
         </div>
-        <div className={style.cardStar}>{drawStars()}</div>
       </div>
     </div>
   )

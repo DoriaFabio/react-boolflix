@@ -10,6 +10,7 @@ const GlobalContext = createContext();
 const GlobalProvider = ({ children }) => {
     const [movies, setMovies] = useState([]);
     const [series, setSeries] = useState([]);
+    const [isSearching, setIsSearching] = useState(false); 
 
     function getData(query, endpoint) {
         axios.get(apiUrl + "search/" + endpoint, {
@@ -23,7 +24,6 @@ const GlobalProvider = ({ children }) => {
             } else {
                 setSeries(res.data.results);
             }
-
         })
             .catch((error) => {
                 console.log(error);
@@ -34,12 +34,20 @@ const GlobalProvider = ({ children }) => {
     }
 
     function search(query) {
-        getData(query, "movie");
-        getData(query, "tv");
+        if(!query) {
+            setMovies([]);
+            setSeries([]);
+            setIsSearching(false);
+        } else {
+            getData(query, "movie");
+            getData(query, "tv");
+            setIsSearching(true);
+        } 
     }
     const data = {
         movies,
         series,
+        isSearching,
         search
     };
 
