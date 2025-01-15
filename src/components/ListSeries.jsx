@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import CardSeries from "./CardSeries"
+import CardMovies from "./CardMovies"
 
 export default function ListSeries({ name, list }) {
   return (
@@ -8,7 +8,7 @@ export default function ListSeries({ name, list }) {
       <div className="row gy-4">
         {list.map((media) => (
           <div className="col-12 col-md-4 col-lg-3" key={media.id}>
-            <CardSeries media={media}/>
+            <CardMovies media={media}/>
           </div>
         ))}
       </div>

@@ -11,30 +11,19 @@ const GlobalProvider = ({ children }) => {
     const [movies, setMovies] = useState([]);
     const [series, setSeries] = useState([]);
 
-    function getData(query) {
-        axios.get(apiUrl + "search/movie", {
+    function getData(query, endpoint) {
+        axios.get(apiUrl + "search/" + endpoint, {
             params: {
                 api_key: apiKey,
                 query,
             },
         }).then((res) => {
-            console.log(res.data);
-            setMovies(res.data.results);
-        })
-            .catch((error) => {
-                console.log(error);
-            })
-            .finally(() => {
-                console.log("Finito");
-            })
-        axios.get(apiUrl + "search/tv", {
-            params: {
-                api_key: apiKey,
-                query,
-            },
-        }).then((res) => {
-            console.log(res.data);
-            setSeries(res.data.results);
+            if (endpoint === "movie") {
+                setMovies(res.data.results);
+            } else {
+                setSeries(res.data.results);
+            }
+
         })
             .catch((error) => {
                 console.log(error);
@@ -45,7 +34,8 @@ const GlobalProvider = ({ children }) => {
     }
 
     function search(query) {
-        getData(query)
+        getData(query, "movie");
+        getData(query, "tv");
     }
     const data = {
         movies,
