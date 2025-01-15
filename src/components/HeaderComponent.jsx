@@ -16,7 +16,7 @@ function HeaderComponent() {
   return (
     <header className='d-flex justify-content-between align-items-center text-white bg-black'>
         <img src="./Netflix_logo.png" alt="Logo Netflix" className="ms-3 my-3 mylogo"/>
-        <form className="d-flex me-3" role="search">
+        <form className="d-flex mx-3" role="search">
             <input
               className="form-control me-2"
               type="search"

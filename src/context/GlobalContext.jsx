@@ -1,4 +1,4 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import axios from "axios";
 
 //? Import apiUrl e apiKey dal file .env
@@ -10,7 +10,10 @@ const GlobalContext = createContext();
 const GlobalProvider = ({ children }) => {
     const [movies, setMovies] = useState([]);
     const [series, setSeries] = useState([]);
-    const [isSearching, setIsSearching] = useState(false); 
+    const [isSearching, setIsSearching] = useState(false);
+    const [popular, setPopular] = useState([])
+
+    useEffect(getPopular, []);
 
     function getData(query, endpoint) {
         axios.get(apiUrl + "search/" + endpoint, {
@@ -33,8 +36,24 @@ const GlobalProvider = ({ children }) => {
             })
     }
 
+    function getPopular() {
+        axios.get(apiUrl + "movie/popular", {
+            params: {
+                api_key: apiKey,
+            },
+        }).then((res) => {
+            setPopular(res.data.results);
+        })
+            .catch((error) => {
+                console.log(error);
+            })
+            .finally(() => {
+                console.log("Finito");
+            })
+    }
+
     function search(query) {
-        if(!query) {
+        if (!query) {
             setMovies([]);
             setSeries([]);
             setIsSearching(false);
@@ -42,12 +61,13 @@ const GlobalProvider = ({ children }) => {
             getData(query, "movie");
             getData(query, "tv");
             setIsSearching(true);
-        } 
+        }
     }
     const data = {
         movies,
         series,
         isSearching,
+        popular,
         search
     };
 

@@ -1,22 +1,22 @@
 // import { useState, useEffect } from "react"
 import { useGlobalContext } from "../context/GlobalContext"
-import ListMovies from "../components/ListMovies"
-import ListSeries from "../components/ListSeries";
+import ListMedia from "../components/ListMedia"
 
 function MainComponent() {
-    const { movies, series, isSearching } = useGlobalContext();
+    const { movies, series, isSearching, popular } = useGlobalContext();
     console.log(movies);
     console.log(series);
     return (
-        <main className="mycontainer py-5">
+        <main className="container py-5">
             {!isSearching ? (
-                <div className="Nolist">
-                    <h2>Prova a cercare un film o una serie tv!</h2>
-                </div>
+                <ListMedia title="popular movie" list={popular} />
+                // <div className="Nolist">
+                //     <h2>Prova a cercare un film o una serie tv!</h2>
+                // </div>
             ) : (
                 <>
-                <ListMovies title="Movies" list={movies}/>
-                <ListSeries name="Serie tv" list={series}/>
+                    <ListMedia title="Movies" list={movies} />
+                    <ListMedia title="Serie tv" list={series} />
                 </>
             )}
         </main>
