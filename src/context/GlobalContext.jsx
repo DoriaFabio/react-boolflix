@@ -1,5 +1,4 @@
 import { useContext, createContext, useState, useEffect } from "react";
-import axios from "axios";
 
 //? Import apiUrl e apiKey dal file .env
 // const apiUrl = import.meta.env.VITE_API_URL
@@ -10,6 +9,7 @@ const apiUrl = "https://api.themoviedb.org/3/"
 const GlobalContext = createContext();
 
 const GlobalProvider = ({ children }) => {
+    //? Variabili reattive
     const [movies, setMovies] = useState([]);
     const [series, setSeries] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -17,34 +17,41 @@ const GlobalProvider = ({ children }) => {
 
     useEffect(getPopular, []);
 
-    function getData(query, endpoint) {
-        axios.get(apiUrl + "search/" + endpoint, {
-            params: {
-                api_key: apiKey,
-                query,
-            },
-        }).then((res) => {
-            if (endpoint === "movie") {
-                setMovies(res.data.results);
-            } else {
-                setSeries(res.data.results);
+    async function getData(query, endpoint) {
+        const url = `${apiUrl}search/${endpoint}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
+
+        try {
+            const res = await fetch(url);
+
+            if (!res.ok) {
+                throw new Error(`Errore nella risposta: ${res.status}`);
             }
-        })
-            .catch((error) => {
-                console.log(error);
-            })
-            .finally(() => {
-                console.log("Finito");
-            })
+
+            const data = await res.json();
+
+            if (endpoint === "movie") {
+                setMovies(data.results);
+            } else {
+                setSeries(data.results);
+            }
+        } catch (error) {
+            console.log("Errore:", error);
+        } finally {
+            console.log("Finito");
+        }
     }
 
+
     function getPopular() {
-        axios.get(apiUrl + "movie/popular", {
-            params: {
-                api_key: apiKey,
-            },
-        }).then((res) => {
-            setPopular(res.data.results);
+        const urlPopular = `${apiUrl}movie/popular?api_key=${apiKey}`;
+        fetch(urlPopular).then((res) => {
+            if (!res.ok) {
+                throw new Error(`Errore nella risposta: ${res.status}`)
+            } else {
+                return res.json();
+            }
+        }).then((data) => {
+            setPopular(data.results);
         })
             .catch((error) => {
                 console.log(error);

@@ -3,11 +3,11 @@ import CardMovies from "./CardMovies"
 
 export default function ListMovies({ title, list }) {
   return (
-    <section className="py-4">
+    <section className="py-7">
       <h3 className="myh3 my-3">{title}</h3>
-      <div className="row gy-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-5">
         {list.map((media) => (
-          <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={media.id}>
+          <div key={media.id}>
             <CardMovies media={media}/>
           </div>
         ))}

@@ -1,11 +1,8 @@
+@import "tailwindcss";
+
 body {
     background-color: #434343;
     color: white;
-}
-
-.mylogo {
-    width: 150px;
-
 }
 
 .Nolist {

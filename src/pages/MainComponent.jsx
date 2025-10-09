@@ -7,7 +7,7 @@ function MainComponent() {
     console.log(movies);
     console.log(series);
     return (
-        <main className="container py-5">
+        <main className="mx-10 py-5">
             {!isSearching ? (
                 <ListMedia title="popular movie" list={popular} />
                 // <div className="Nolist">

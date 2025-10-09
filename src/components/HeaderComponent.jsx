@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useGlobalContext } from "../context/GlobalContext"
 
 function HeaderComponent() {
-  const {search} = useGlobalContext();
+  const { search } = useGlobalContext();
   const [query, setQuery] = useState("");
 
   function handleInput(e) {
@@ -14,26 +14,26 @@ function HeaderComponent() {
   }
 
   return (
-    <header className='d-flex justify-content-between align-items-center text-white bg-black'>
-        <img src="./Netflix_logo.png" alt="Logo Netflix" className="ms-3 my-3 mylogo"/>
-        <form className="d-flex mx-3" role="search">
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Cerca un titolo"
-              aria-label="Search"
-              name="query"
-              id="query"
-              onChange={handleInput}
-            />
-            <button
-              className="btn btn-danger"
-              type="search"
-              onClick={handleSearch}
-            >
-              Cerca
-            </button>
-          </form>
+    <header className='flex justify-between items-center text-white bg-black'>
+      <img src="./Netflix_logo.png" alt="Logo Netflix" className="ml-5 my-5 w-[150px] h-auto" />
+      <form className="flex mx-3" role="search">
+        <input
+          className="form-control mr-5"
+          type="search"
+          placeholder="Cerca un titolo"
+          aria-label="Search"
+          name="query"
+          id="query"
+          onChange={handleInput}
+        />
+        <button
+          className=""
+          type="search"
+          onClick={handleSearch}
+        >
+          Cerca
+        </button>
+      </form>
     </header>
   )
 }
