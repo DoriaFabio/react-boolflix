@@ -17,6 +17,7 @@ const GlobalProvider = ({ children }) => {
 
     useEffect(getPopular, []);
 
+    //! Funzione che recupera tutti i dati seguendo quello scritto nella query
     async function getData(query, endpoint) {
         const url = `${apiUrl}search/${endpoint}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
 
@@ -37,11 +38,14 @@ const GlobalProvider = ({ children }) => {
         } catch (error) {
             console.log("Errore:", error);
         } finally {
-            console.log("Finito");
+            () => {
+                console.log("Finito");
+            }
+
         }
     }
 
-
+    //! Funzione che recupera i film più popolari
     function getPopular() {
         const urlPopular = `${apiUrl}movie/popular?api_key=${apiKey}`;
         fetch(urlPopular).then((res) => {
@@ -61,6 +65,7 @@ const GlobalProvider = ({ children }) => {
             })
     }
 
+    //! Funzione che richiama i dati
     function search(query) {
         if (!query) {
             setMovies([]);
@@ -72,12 +77,41 @@ const GlobalProvider = ({ children }) => {
             setIsSearching(true);
         }
     }
+
+    //! Funzione asincrona per recuperare un singolo elemento da un endpoint API dato un path e un id
+    async function fetchById(endpoint, id) {
+        const url = `${apiUrl}${endpoint}/${id}?api_key=${apiKey}&append_to_response=credits,videos,recommendations`;
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Errore nella risposta del server");
+            const data = await res.json();
+            return data;
+        } catch (err) {
+            console.error("Errore nel caricamento dei dati:", err);
+            throw err;
+        }
+    }
+
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    async function getItemDetails(endpoint, id) {
+        try {
+            const data = await fetchById(endpoint, id);
+            setSelectedItem(data);
+        } catch (error) {
+            console.error("Errore nel recupero dettagli:", error);
+        }
+    }
+
     const data = {
         movies,
         series,
         isSearching,
         popular,
-        search
+        search,
+        selectedItem,
+        fetchById,
+        getItemDetails
     };
 
     return (

@@ -1,8 +1,10 @@
-// import { useState } from 'react'
 import './App.css'
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import DefaultLayout from './pages/DefaultLayout'
 import MainComponent from './pages/MainComponent'
+import DetailPage from './pages/DetailPage'
 import { GlobalProvider } from "./context/GlobalContext"
 
 function App() {
@@ -13,6 +15,7 @@ function App() {
         <Routes>
           <Route Component={DefaultLayout}>
             <Route path='/' Component={MainComponent} />
+            <Route path='/:type/:id' Component={DetailPage} />
           </Route>
         </Routes>
       </BrowserRouter>

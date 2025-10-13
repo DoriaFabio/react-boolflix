@@ -29,3 +29,22 @@ body {
         display: none;
     }
 }
+
+.slick-slide > div {
+  margin: 0 4px;
+}
+.slick-list {
+  margin: 0 -4px;
+}
+.slick-prev:before,
+.slick-next:before {
+  color: #f59e0b; /* giallo ambra Tailwind */
+  font-size: 30px;
+}
+.slick-prev {
+  left: -40px;
+}
+.slick-next {
+  right: -40px;
+}
+
