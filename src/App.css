@@ -34,8 +34,18 @@ body {
   margin: 0 4px;
 }
 .slick-list {
-  margin: 0 -4px;
+  overflow-x: hidden !important;  /* 👈 blocca i lati */
+  overflow-y: clip !important; /* 👈 libera sopra/sotto */
 }
+
+.slick-slide {
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+.slick-slide:hover {
+  z-index: 10; /* 👈 porta quella in hover in primo piano */
+}
+
 .slick-prev:before,
 .slick-next:before {
   color: #f59e0b; /* giallo ambra Tailwind */
@@ -43,8 +53,24 @@ body {
 }
 .slick-prev {
   left: -40px;
+  z-index: 20;
 }
 .slick-next {
   right: -40px;
+  z-index: 20;
+}
+
+.slick-slider {
+  display: block !important;
+  width: 100% !important;
+}
+.slick-track {
+  display: flex !important;
+  align-items: center;
+}
+.slick-slide > div {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
 }
 

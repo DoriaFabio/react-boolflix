@@ -13,9 +13,9 @@
 
 .cardImg {
     aspect-ratio: 1/1.5;
-    overflow: hidden;
-    transition: all 0.5s;
-    cursor: pointer;
+    overflow: visible;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .cardContent {
@@ -32,7 +32,7 @@
 }
 
 .cardImg:hover {
-    box-shadow: 1px 1px 10px 12px rgb(21, 21, 21);
+    box-shadow: 1px 1px 5px 7px rgb(21, 21, 21);
     transform: scale(1.03);
 
     .cardContent {

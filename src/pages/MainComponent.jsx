@@ -22,7 +22,7 @@ function MainComponent() {
         <main className="mx-10 py-5 flex flex-col items-center">
             <HandleSearch />
             {!isSearching ? (
-                <ListMedia title="popular movie" list={popular} />
+                <ListMedia title="Popular movie" list={popular} />
                 // <div className="Nolist">
                 //     <h2>Prova a cercare un film o una serie tv!</h2>
                 // </div>
