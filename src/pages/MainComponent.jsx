@@ -1,4 +1,3 @@
-// import { useState, useEffect } from "react"
 import { useGlobalContext } from "../context/GlobalContext"
 import ListMedia from "../components/ListMedia"
 import HandleSearch from "../components/handleSearch";

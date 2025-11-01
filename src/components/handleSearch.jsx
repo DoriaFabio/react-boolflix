@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useGlobalContext } from "../context/GlobalContext";
+import { FiSearch } from "react-icons/fi";
 
 export default function HandleSearch() {
   const { search } = useGlobalContext();
@@ -23,11 +24,26 @@ export default function HandleSearch() {
   );
 
   return (
-    <input
-      type="text"
-      placeholder="Cerca per titolo"
-      onChange={(e) => debounceSearch(e.target.value)}
-      className="bg-amber-50 rounded-xl text-black p-2 shadow-md shadow-gray-400 mx-10"
-    />
+    <div className="relative w-[90%] md:w-[400px] mx-auto">
+      <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors duration-300" />
+      <input
+        type="text"
+        placeholder="Cerca per titolo..."
+        onChange={(e) => debounceSearch(e.target.value)}
+        className="
+          bg-[#141414]
+          text-white
+          placeholder-gray-400
+          rounded-full
+          pl-10 pr-4 py-2
+          w-full
+          outline-none
+          border border-transparent
+          focus:border-red-600
+          focus:shadow-[0_0_10px_rgba(229,9,20,0.5)]
+          transition-all duration-300
+        "
+      />
+    </div>
   );
 }
