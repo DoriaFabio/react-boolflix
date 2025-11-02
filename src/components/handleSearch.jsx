@@ -31,7 +31,7 @@ export default function HandleSearch() {
         placeholder="Cerca per titolo..."
         onChange={(e) => debounceSearch(e.target.value)}
         className="
-          bg-[#141414]
+          bg-[#000000]
           text-white
           placeholder-gray-400
           rounded-full
