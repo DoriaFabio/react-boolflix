@@ -6,7 +6,7 @@ import DefaultLayout from './pages/DefaultLayout'
 import MainComponent from './pages/MainComponent'
 import DetailPage from './pages/DetailPage'
 import { GlobalProvider } from "./context/GlobalContext"
-import Watchlist from './pages/Watchlist';
+import WatchlistPage from './pages/Watchlist';
 
 function App() {
 
@@ -17,7 +17,7 @@ function App() {
           <Route Component={DefaultLayout}>
             <Route path='/' Component={MainComponent} />
             <Route path='/:type/:id' Component={DetailPage} />
-            <Route path='/watchlist' Component={Watchlist}></Route>
+            <Route path='/watchlist' Component={WatchlistPage}></Route>
           </Route>
         </Routes>
       </BrowserRouter>

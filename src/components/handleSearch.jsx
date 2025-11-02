@@ -25,7 +25,7 @@ export default function HandleSearch() {
 
   return (
     <div className="relative w-[90%] md:w-[400px] mx-auto">
-      <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors duration-300" />
+      <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500" />
       <input
         type="text"
         placeholder="Cerca per titolo..."
