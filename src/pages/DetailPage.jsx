@@ -8,7 +8,6 @@ import { FiStar } from "react-icons/fi";
 function DetailPage() {
   const { id, type } = useParams();
   const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist } = useGlobalContext();
-
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,8 +49,8 @@ function DetailPage() {
     return Math.max(0, Math.min(5, five));
   }, [details]);
 
-  if (loading) { /* skeleton */ }
-  if (error) { /* error */ }
+  if (loading) return <h3 className="text-center mt-10 text-3xl">Caricamento...</h3>;
+  if (error) return <h3 className="text-center mt-10 text-3xl">Errore visualizzazione dati</h3>;
   if (!details) return null;
 
   const title = details.title || details.name;
@@ -60,7 +59,7 @@ function DetailPage() {
     ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
     : null;
 
-  // 🔴 QUI: stato watchlist calcolato con il context
+  //!  stato watchlist calcolato con il context
   const inList = isInWatchlist(type, details.id);
   const handleToggleWatchlist = () => {
     if (inList) removeFromWatchlist(type, details.id);
@@ -157,7 +156,6 @@ function DetailPage() {
               </div>
             </div>
           </div>
-
           {cast.length > 0 && <CastComponent cast={cast} />}
         </div>
       </div>

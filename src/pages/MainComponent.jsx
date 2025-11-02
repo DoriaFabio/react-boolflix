@@ -3,11 +3,11 @@ import ListMedia from "../components/ListMedia"
 import HandleSearch from "../components/handleSearch";
 
 function MainComponent() {
-    const { movies, series, isSearching, popular } = useGlobalContext();
-    console.log(movies);
-    console.log(series);
+  const { movies, series, isSearching, popular } = useGlobalContext();
+  console.log(movies);
+  console.log(series);
 
-    // Se i dati popolari non sono ancora arrivati
+  //! Se i dati popolari non sono ancora arrivati
   if (!popular || popular.length === 0) {
     return (
       <main className="flex flex-col items-center text-white mt-10">
@@ -17,22 +17,19 @@ function MainComponent() {
     );
   }
 
-    return (
-        <main className="mx-10 py-5 flex flex-col items-center">
-            <HandleSearch />
-            {!isSearching ? (
-                <ListMedia title="Popular movie" list={popular} />
-                // <div className="Nolist">
-                //     <h2>Prova a cercare un film o una serie tv!</h2>
-                // </div>
-            ) : (
-                <>
-                    <ListMedia title="Movies" list={movies} />
-                    <ListMedia title="Serie tv" list={series} />
-                </>
-            )}
-        </main>
-    );
+  return (
+    <main className="mx-10 py-5 flex flex-col items-center">
+      <HandleSearch />
+      {!isSearching ? (
+        <ListMedia title="Popular movie" list={popular} />
+      ) : (
+        <>
+          <ListMedia title="Movies" list={movies} />
+          <ListMedia title="Serie tv" list={series} />
+        </>
+      )}
+    </main>
+  );
 }
 
 export default MainComponent

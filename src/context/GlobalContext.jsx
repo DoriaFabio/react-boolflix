@@ -1,112 +1,102 @@
-import { useContext, createContext, useState, useEffect, useCallback } from "react";
-// const apiUrl = import.meta.env.VITE_API_URL
-// const apiKey = import.meta.env.VITE_API_KEY
+import { useContext, createContext, useState, useEffect } from "react";
+import useWatchlist from "../hooks/useWatchlist";
+
+/* =====================================================
+  ! CONFIG / COSTANTI
+  ? - In produzione preferisci leggere API_URL e API_KEY da variabili d'ambiente.
+   ===================================================== */
 const apiKey = "cc3ab39c39766d9bbdfb7697ef7e22f1";
 const apiUrl = "https://api.themoviedb.org/3/";
+const LS_KEY = "watchlist"; // chiave per localStorage nel custom hook
 
+//! Creazione del contesto globale
 const GlobalContext = createContext();
 
-const LS_KEY = "watchlist"; // ← chiave locale
-
-// Helpers sicuri per localStorage
-function safeLoad(key, fallback = []) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-function safeSave(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    console.warn("Impossibile salvare in localStorage");
-  }
-}
-
+/* =====================================================
+  ! PROVIDER
+  ? - Mantiene lo stato globale dell’app (risultati ricerca, popolari, selezione, ecc.)
+  ? - Espone le API per cercare, leggere dettagli, e gestire la watchlist (tramite hook).
+   ===================================================== */
 const GlobalProvider = ({ children }) => {
-  //? Variabili reattive
+  //? Stato di lista (risultati/collezioni)
   const [movies, setMovies] = useState([]);
   const [series, setSeries] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [popular, setPopular] = useState([]);
 
-  // --- WATCHLIST STATE ---
-  const [watchlist, setWatchlist] = useState(() => safeLoad(LS_KEY, []));
-  // Ogni item: { id, type: "movie"|"tv", title/name, poster_path, vote_average, addedAt }
+  //? Stato UI
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Persistenza locale
+  //? Dettaglio corrente (opzionale)
+  // const [selectedItem, setSelectedItem] = useState(null);
+
+  //todo Watchlist (delegata al custom hook)
+  const {
+    watchlist,
+    addToWatchlist,
+    removeFromWatchlist,
+    isInWatchlist,
+    getWatchlist,
+  } = useWatchlist(LS_KEY);
+
+  //! Caricamento iniziale dei popolari
   useEffect(() => {
-    safeSave(LS_KEY, watchlist);
-  }, [watchlist]);
+    getPopular(); 
+  }, []); 
 
-  // Sync tra tab/finestra
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === LS_KEY) {
-        setWatchlist(safeLoad(LS_KEY, []));
-      }
-    };
-    window.addEventListener("storage", handler);
-    return () => window.removeEventListener("storage", handler);
-  }, []);
-
-  useEffect(getPopular, []);
-
-  //! Funzione che recupera tutti i dati seguendo quello scritto nella query
+  /* ============================================
+    ! FUNZIONI API TMDB
+     ============================================ */
+  /**
+   *! getData
+   *todo Ricerca per testo su un endpoint TMDB (movie | tv) e aggiorna lo stato relativo.
+   *? @param {string} query - Testo da cercare
+   *? @param {"movie"|"tv"} endpoint - Target della ricerca
+   */
   async function getData(query, endpoint) {
     const url = `${apiUrl}search/${endpoint}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
-
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Errore nella risposta: ${res.status}`);
       const data = await res.json();
-
-      if (endpoint === "movie") setMovies(data.results);
-      else setSeries(data.results);
+      if (endpoint === "movie") {
+        setMovies(data.results || []);
+      } else {
+        setSeries(data.results || []);
+      }
     } catch (error) {
-      console.log("Errore:", error);
+      console.error("Errore caricamento film:", error);
     } finally {
-      () => {
-        console.log("Finito");
-      };
+      // Qui puoi eventualmente disattivare spinner specifici
     }
   }
 
-  //! Funzione che recupera i film più popolari
+  /**
+   *! getPopular
+   *todo Recupera i film popolari (prima schermata/landing).
+   */
   function getPopular() {
     const urlPopular = `${apiUrl}movie/popular?api_key=${apiKey}`;
+
     fetch(urlPopular)
       .then((res) => {
         if (!res.ok) throw new Error(`Errore nella risposta: ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        setPopular(data.results);
+        setPopular(data.results || []);
       })
       .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        console.log("Finito");
+        console.error("Errore caricamento film popolari:", error);
       });
   }
 
-  //! Funzione che richiama i dati
-  function search(query) {
-    if (!query) {
-      setMovies([]);
-      setSeries([]);
-      setIsSearching(false);
-    } else {
-      getData(query, "movie");
-      getData(query, "tv");
-      setIsSearching(true);
-    }
-  }
-
-  //! Fetch dettaglio
+  /**
+   *! fetchById
+   *todo Recupera i dettagli di un singolo media (movie/tv) includendo credits, video, e raccomandazioni.
+   *? @param {"movie"|"tv"} endpoint
+   *? @param {string|number} id
+   *? @returns {Promise<object>}
+   */
   async function fetchById(endpoint, id) {
     const url = `${apiUrl}${endpoint}/${id}?api_key=${apiKey}&append_to_response=credits,videos,recommendations`;
     try {
@@ -115,75 +105,133 @@ const GlobalProvider = ({ children }) => {
       const data = await res.json();
       return data;
     } catch (err) {
-      console.error("Errore nel caricamento dei dati:", err);
+      console.error("Errore caricamento dati film:", err);
       throw err;
     }
   }
 
-  const [selectedItem, setSelectedItem] = useState(null);
+  /**
+   * getItemDetails
+   * Wrapper che salva in stato il risultato di fetchById (utile per viste che leggono selectedItem).
+   */
+  // async function getItemDetails(endpoint, id) {
+  //   try {
+  //     const data = await fetchById(endpoint, id);
+  //     setSelectedItem(data);
+  //   } catch (error) {
+  //     console.error("Errore getItemDetails:", error);
+  //   }
+  // }
 
-  async function getItemDetails(endpoint, id) {
+  /**
+   *! getMediaByPerson
+   *todo Ricerca per "persona" e aggiunge in lista i media correlati (movie/tv), senza duplicati.
+   *? Nota: si somma ai risultati di getData(query, "movie"/"tv").
+   *? @param {string} query - Nome persona (attori, registi, ecc.)
+   */
+  async function getMediaByPerson(query) {
     try {
-      const data = await fetchById(endpoint, id);
-      setSelectedItem(data);
-    } catch (error) {
-      console.error("Errore nel recupero dettagli:", error);
+      //* 1) Trova persone per query
+      const urlPerson = `${apiUrl}search/person?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
+      const resPerson = await fetch(urlPerson);
+      if (!resPerson.ok) throw new Error(`Errore persone: ${resPerson.status}`);
+      const dataPerson = await resPerson.json();
+      const persons = dataPerson.results || [];
+      //* 2) Per ogni persona, recupera crediti movie/tv in parallelo
+      const movieItems = [];
+      const tvItems = [];
+
+      await Promise.all(
+        persons.map(async (person) => {
+          try {
+            const [resMovieCredits, resTvCredits] = await Promise.all([
+              fetch(`${apiUrl}person/${person.id}/movie_credits?api_key=${apiKey}`),
+              fetch(`${apiUrl}person/${person.id}/tv_credits?api_key=${apiKey}`),
+            ]);
+
+            if (resMovieCredits?.ok) {
+              const credits = await resMovieCredits.json();
+              if (credits.cast) movieItems.push(...credits.cast);
+              if (credits.crew) movieItems.push(...credits.crew);
+            }
+
+            if (resTvCredits?.ok) {
+              const credits = await resTvCredits.json();
+              if (credits.cast) tvItems.push(...credits.cast);
+              if (credits.crew) tvItems.push(...credits.crew);
+            }
+          } catch (err) {
+            console.error(`Errore crediti per la persona ${person.id}:`, err);
+          }
+        })
+      );
+
+      //* 3) Elimina duplicati da un array di oggetti basandosi sull'id
+      const uniqueMovies = Array.from(new Map(movieItems.map((m) => [m.id, m])).values());
+      const uniqueTv = Array.from(new Map(tvItems.map((t) => [t.id, t])).values());
+
+      //* 4) Merge con stato esistente (evita duplicati)
+      setMovies((prev) => {
+        const map = new Map(prev.map((p) => [p.id, p]));
+        uniqueMovies.forEach((u) => {
+          if (!map.has(u.id)) map.set(u.id, u);
+        });
+        return Array.from(map.values());
+      });
+
+      setSeries((prev) => {
+        const map = new Map(prev.map((p) => [p.id, p]));
+        uniqueTv.forEach((u) => {
+          if (!map.has(u.id)) map.set(u.id, u);
+        });
+        return Array.from(map.values());
+      });
+    } catch (err) {
+      console.error("Errore getMediaByPerson:", err);
     }
   }
 
-  // ------- WATCHLIST API -------
+  /* ========================================================
+    ! API DI RICERCA (coordinamento delle chiamate)
+     ======================================================== */
 
-  // Chiave unica: `${type}:${id}`
-  const makeKey = useCallback((type, id) => `${type}:${id}`, []);
+  /**
+   *! search
+   *todo Esegue la ricerca combinata su film, serie e persone.
+   *? - query falsy: reset risultati e stato di ricerca
+   *? - query valida: avvia tutte le chiamate e imposta isSearching=true
+   */
+  function search(query) {
+    if (!query) {
+      setMovies([]);
+      setSeries([]);
+      setIsSearching(false);
+      return;
+    }
+    //? Ricerca parallela movie/tv + media da persone
+    getData(query, "movie");
+    getData(query, "tv");
+    getMediaByPerson(query);
+    setIsSearching(true);
+  }
 
-  const isInWatchlist = useCallback(
-    (type, id) => {
-      const key = makeKey(type, id);
-      return watchlist.some((it) => makeKey(it.type, it.id) === key);
-    },
-    [watchlist, makeKey]
-  );
-
-  const addToWatchlist = useCallback(
-    (item) => {
-      // item: oggetto TMDB dettagliato (movie o tv)
-      if (!item || !item.id) return;
-      const type = item.title ? "movie" : "tv";
-      if (isInWatchlist(type, item.id)) return; // evita duplicati
-
-      const normalized = {
-        id: item.id,
-        type,
-        title: item.title || item.name || "",
-        poster_path: item.poster_path || null,
-        vote_average: item.vote_average ?? null,
-        addedAt: Date.now(),
-      };
-
-      setWatchlist((prev) => [normalized, ...prev]);
-    },
-    [isInWatchlist]
-  );
-
-  const removeFromWatchlist = useCallback((type, id) => {
-    setWatchlist((prev) =>
-      prev.filter((it) => !(it.type === type && it.id === Number(id)))
-    );
-  }, []);
-
-  const getWatchlist = useCallback(() => watchlist, [watchlist]);
-
-  const data = {
+  /* =========================================================
+    ! VALORE ESPORTATO DAL CONTESTO
+     ========================================================= */
+  const contextValue = {
+    //todo Stato risultati
     movies,
     series,
-    isSearching,
     popular,
-    search,
-    selectedItem,
-    fetchById,
-    getItemDetails,
+    isSearching,
 
-    // Watchlist API
+    //todo Azioni di ricerca/dettagli
+    search,
+    fetchById,
+    // getItemDetails,
+    // selectedItem,
+
+    //todo Watchlist API (dal custom hook)
     watchlist,
     addToWatchlist,
     removeFromWatchlist,
@@ -191,11 +239,18 @@ const GlobalProvider = ({ children }) => {
     getWatchlist,
   };
 
-  return <GlobalContext.Provider value={data}>{children}</GlobalContext.Provider>;
+  return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
 };
 
+/* ===========================================================
+  ! HOOK COMODO PER CONSUMARE IL CONTESTO
+   =========================================================== */
 function useGlobalContext() {
   const context = useContext(GlobalContext);
+  if (!context) {
+    // opzionale: messaggio d'aiuto per debug se usato fuori dal provider
+    console.warn("useGlobalContext deve essere usato dentro <GlobalProvider />");
+  }
   return context;
 }
 
