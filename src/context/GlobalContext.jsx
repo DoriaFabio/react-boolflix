@@ -1,13 +1,11 @@
 import { useContext, createContext, useState, useEffect } from "react";
-import useWatchlist from "../hooks/useWatchlist";
-
+import useLocalStorageList from "../hooks/useLocalStorageList";
 /* =====================================================
   ! CONFIG / COSTANTI
   ? - In produzione preferisci leggere API_URL e API_KEY da variabili d'ambiente.
    ===================================================== */
 const apiKey = "cc3ab39c39766d9bbdfb7697ef7e22f1";
 const apiUrl = "https://api.themoviedb.org/3/";
-const LS_KEY = "watchlist"; // chiave per localStorage nel custom hook
 
 //! Creazione del contesto globale
 const GlobalContext = createContext();
@@ -26,17 +24,23 @@ const GlobalProvider = ({ children }) => {
   //? Stato UI
   const [isSearching, setIsSearching] = useState(false);
 
-  //? Dettaglio corrente (opzionale)
-  // const [selectedItem, setSelectedItem] = useState(null);
-
-  //todo Watchlist (delegata al custom hook)
+  //todo Watchlist (delegata al custom hook generico)
   const {
-    watchlist,
-    addToWatchlist,
-    removeFromWatchlist,
-    isInWatchlist,
-    getWatchlist,
-  } = useWatchlist(LS_KEY);
+    list: watchlist,
+    addToList: addToWatchlist,
+    removeFromList: removeFromWatchlist,
+    isInList: isInWatchlist,
+    getList: getWatchlist,
+  } = useLocalStorageList("watchlist");
+
+  //todo Favourites (delegata al custom hook generico)
+  const {
+    list: favourites,
+    addToList: addToFavourites,
+    removeFromList: removeFromFavourites,
+    isInList: isInFavourites,
+    getList: getFavourite,
+  } = useLocalStorageList("favourites");
 
   //! Caricamento iniziale dei popolari
   useEffect(() => {
@@ -58,15 +62,17 @@ const GlobalProvider = ({ children }) => {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Errore nella risposta: ${res.status}`);
       const data = await res.json();
+      //! Filtra solo i risultati con popolarità > 35
+      const filteredResults = (data.results || []).filter(item => item.vote_average > 3 && item.vote_count > 10);
       if (endpoint === "movie") {
-        setMovies(data.results || []);
+        setMovies(filteredResults);
       } else {
-        setSeries(data.results || []);
+        setSeries(filteredResults);
       }
     } catch (error) {
       console.error("Errore caricamento film:", error);
     } finally {
-      // Qui puoi eventualmente disattivare spinner specifici
+      //? Qui puoi eventualmente disattivare spinner specifici
     }
   }
 
@@ -111,19 +117,6 @@ const GlobalProvider = ({ children }) => {
   }
 
   /**
-   * getItemDetails
-   * Wrapper che salva in stato il risultato di fetchById (utile per viste che leggono selectedItem).
-   */
-  // async function getItemDetails(endpoint, id) {
-  //   try {
-  //     const data = await fetchById(endpoint, id);
-  //     setSelectedItem(data);
-  //   } catch (error) {
-  //     console.error("Errore getItemDetails:", error);
-  //   }
-  // }
-
-  /**
    *! getMediaByPerson
    *todo Ricerca per "persona" e aggiunge in lista i media correlati (movie/tv), senza duplicati.
    *? Nota: si somma ai risultati di getData(query, "movie"/"tv").
@@ -166,9 +159,9 @@ const GlobalProvider = ({ children }) => {
         })
       );
 
-      //* 3) Elimina duplicati da un array di oggetti basandosi sull'id
-      const uniqueMovies = Array.from(new Map(movieItems.map((m) => [m.id, m])).values());
-      const uniqueTv = Array.from(new Map(tvItems.map((t) => [t.id, t])).values());
+      //* 3) Elimina duplicati da un array di oggetti basandosi sull'id e filtra per popolarità > 35
+      const uniqueMovies = Array.from(new Map(movieItems.map((m) => [m.id, m])).values()).filter(m => m.vote_average > 3 && m.vote_count > 10);
+      const uniqueTv = Array.from(new Map(tvItems.map((t) => [t.id, t])).values()).filter(t => t.vote_average > 3 && t.vote_count > 10);
 
       //* 4) Merge con stato esistente (evita duplicati)
       setMovies((prev) => {
@@ -228,8 +221,6 @@ const GlobalProvider = ({ children }) => {
     //todo Azioni di ricerca/dettagli
     search,
     fetchById,
-    // getItemDetails,
-    // selectedItem,
 
     //todo Watchlist API (dal custom hook)
     watchlist,
@@ -237,6 +228,13 @@ const GlobalProvider = ({ children }) => {
     removeFromWatchlist,
     isInWatchlist,
     getWatchlist,
+
+    //todo Favourites API
+    favourites,
+    addToFavourites,
+    removeFromFavourites,
+    isInFavourites,
+    getFavourite,
   };
 
   return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
@@ -248,7 +246,7 @@ const GlobalProvider = ({ children }) => {
 function useGlobalContext() {
   const context = useContext(GlobalContext);
   if (!context) {
-    // opzionale: messaggio d'aiuto per debug se usato fuori dal provider
+    //? opzionale: messaggio d'aiuto per debug se usato fuori dal provider
     console.warn("useGlobalContext deve essere usato dentro <GlobalProvider />");
   }
   return context;

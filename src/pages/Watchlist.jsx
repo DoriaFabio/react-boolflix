@@ -52,7 +52,7 @@ function WatchlistPage() {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    Nessun poster
+                    Nessun film/serie tv
                   </div>
                 )}
               </div>

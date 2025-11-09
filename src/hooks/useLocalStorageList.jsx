@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 
-//! Chiave di default per il localStorage
-const LS_KEY_DEFAULT = "watchlist";
-
 /**
  *! Carica e parse-a un valore da localStorage.
  *todo @param {string} key - chiave di localStorage
@@ -19,6 +16,7 @@ function safeLoad(key, fallback = []) {
         return fallback;
     }
 }
+
 /**
  *! Salva un valore in localStorage in modo sicuro.
  *todo @param {string} key
@@ -33,32 +31,33 @@ function safeSave(key, value) {
 }
 
 /* =======================================================
-   ! Hook: useWatchlist
+   ! Hook Generico: useLocalStorageList
    todo - Gestisce una lista (film/serie) persistita su localStorage.
-   todo - Espone API per aggiungere/rimuovere/controllare presenza, e ottenere l’elenco.
+   todo - Espone API per aggiungere/rimuovere/controllare presenza, e ottenere l'elenco.
    todo - Sincronizza automaticamente tra più tab del browser.
+   todo - Riutilizzabile per qualsiasi tipo di lista (watchlist, favourites, ecc.)
    ======================================================= */
-export default function useWatchlist(key = LS_KEY_DEFAULT) {
+export default function useLocalStorageList(storageKey) {
     //? Stato iniziale: carica da localStorage una sola volta (init function di useState)
-    const [watchlist, setWatchlist] = useState(() => safeLoad(key, []));
+    const [list, setList] = useState(() => safeLoad(storageKey, []));
 
     /* ---------------- Persistenza locale ---------------- !*/
-    //todo Ogni volta che cambia la watchlist, salva su localStorage
+    //todo Ogni volta che cambia la lista, salva su localStorage
     useEffect(() => {
-        safeSave(key, watchlist);
-    }, [key, watchlist]);
+        safeSave(storageKey, list);
+    }, [storageKey, list]);
 
     /* ---------------- Sincronizzazione tra tab ---------------- */
     //todo Se un'altra tab modifica la stessa chiave, aggiorna lo stato locale
     useEffect(() => {
         const handler = (e) => {
-            if (e.key === key) {
-                setWatchlist(safeLoad(key, []));
+            if (e.key === storageKey) {
+                setList(safeLoad(storageKey, []));
             }
         };
         window.addEventListener("storage", handler);
         return () => window.removeEventListener("storage", handler);
-    }, [key]);
+    }, [storageKey]);
 
     /* ---------------- Helpers ---------------- */
     /**
@@ -67,21 +66,21 @@ export default function useWatchlist(key = LS_KEY_DEFAULT) {
      */
     const makeKey = useCallback((type, id) => `${type}:${id}`, []);
 
-    //* Ritorna true se (type,id) è già presente in watchlist.
-    const isInWatchlist = useCallback(
+    //* Ritorna true se (type,id) è già presente nella lista.
+    const isInList = useCallback(
         (type, id) => {
             const keyStr = makeKey(type, id);
-            return watchlist.some((it) => makeKey(it.type, it.id) === keyStr);
+            return list.some((it) => makeKey(it.type, it.id) === keyStr);
         },
-        [watchlist, makeKey]
+        [list, makeKey]
     );
 
-    //* Aggiunge un elemento alla watchlist (se non già presente).
-    const addToWatchlist = useCallback(
+    //* Aggiunge un elemento alla lista (se non già presente).
+    const addToList = useCallback(
         (item) => {
             if (!item || !item.id) return;
             const type = item.title ? "movie" : "tv";
-            if (isInWatchlist(type, item.id)) return; //? già in lista
+            if (isInList(type, item.id)) return; //? già in lista
 
             //? Normalizzazione payload salvato
             const normalized = {
@@ -92,25 +91,26 @@ export default function useWatchlist(key = LS_KEY_DEFAULT) {
                 vote_average: item.vote_average ?? null,
             };
 
-            setWatchlist((prev) => [normalized, ...prev]);
+            setList((prev) => [normalized, ...prev]);
         },
-        [isInWatchlist]
+        [isInList]
     );
 
-    //* Rimuove un elemento dalla watchlist dato type+id.
-    const removeFromWatchlist = useCallback((type, id) => {
-        setWatchlist((prev) =>
+    //* Rimuove un elemento dalla lista dato type+id.
+    const removeFromList = useCallback((type, id) => {
+        setList((prev) =>
             prev.filter((it) => !(it.type === type && it.id === Number(id)))
         );
     }, []);
-    //* Restituisce l’array corrente (comodo per evitare dipendenze esterne)
-    const getWatchlist = useCallback(() => watchlist, [watchlist]);
+
+    //* Restituisce l'array corrente (comodo per evitare dipendenze esterne)
+    const getList = useCallback(() => list, [list]);
 
     return {
-        watchlist,
-        addToWatchlist,
-        removeFromWatchlist,
-        isInWatchlist,
-        getWatchlist,
+        list,
+        addToList,
+        removeFromList,
+        isInList,
+        getList,
     };
 }

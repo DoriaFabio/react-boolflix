@@ -1,4 +1,4 @@
-import { FiMinus, FiPlay, FiPlus } from "react-icons/fi";
+import { FiHeart, FiMinus, FiPlay, FiPlus } from "react-icons/fi";
 
 function HeroDetail({
     title,
@@ -49,6 +49,11 @@ function HeroDetail({
                     >
                         {inWatchlist ? <FiMinus /> : <FiPlus />}
                         {inWatchlist ? "Rimuovi dalla Watchlist" : "Aggiungi a Watchlist"}
+                    </button>
+                    <button
+                        type="button"
+                        className={"inline-flex items-center gap-2 px-4 py-2 rounded-full transition-colors bg-white/10 hover:bg-white/20"}>
+                            <FiHeart />
                     </button>
                 </div>
             </div>

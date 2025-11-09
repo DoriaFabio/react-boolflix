@@ -15,7 +15,7 @@ export default function CardMovies({ media }) {
   const drawStars = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-      const star = i <= Math.ceil(media.vote_average / 2) ? <FaStar key={i} /> : <FaRegStar key={i} />;
+      const star = i <= Math.round(media.vote_average / 2) ? <FaStar key={i} /> : <FaRegStar key={i} />;
       stars.push(star);
     }
     return stars;
