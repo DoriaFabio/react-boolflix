@@ -1,4 +1,5 @@
 import { FiHeart, FiMinus, FiPlay, FiPlus } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
 
 function HeroDetail({
     title,
@@ -6,7 +7,9 @@ function HeroDetail({
     backdrop,          // url background
     trailerKey,        // stringa YouTube key
     inWatchlist,       // boolean
+    inFavourite,
     onToggleWatchlist, // funzione da chiamare al click
+    onToggleFavorite,  // funzione da chiamare al click
 }) {
     return (
         <section
@@ -52,8 +55,9 @@ function HeroDetail({
                     </button>
                     <button
                         type="button"
+                        onClick={onToggleFavorite}
                         className={"inline-flex items-center gap-2 px-4 py-2 rounded-full transition-colors bg-white/10 hover:bg-white/20"}>
-                            <FiHeart />
+                            {inFavourite ? <FaHeart className="text-red-500" /> : <FiHeart className="text-red-500"/>}
                     </button>
                 </div>
             </div>

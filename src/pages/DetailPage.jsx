@@ -7,7 +7,7 @@ import { FiStar } from "react-icons/fi";
 
 function DetailPage() {
   const { id, type } = useParams();
-  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist } = useGlobalContext();
+  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites } = useGlobalContext();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,10 +61,15 @@ function DetailPage() {
 
   //!  stato watchlist calcolato con il context
   const inList = isInWatchlist(type, details.id);
+  const inList2 = isInFavourites(type, details.id); 
   const handleToggleWatchlist = () => {
     if (inList) removeFromWatchlist(type, details.id);
     else addToWatchlist(details);
   };
+  const handleToggleFavorite = () => {
+    if (inList2) removeFromFavourites(type, details.id);
+    else addToFavourites(details);
+  }
 
   return (
     <div className="text-white">
@@ -74,7 +79,9 @@ function DetailPage() {
         backdrop={backdrop}
         trailerKey={trailer?.key}
         inWatchlist={inList}
+        inFavourite={inList2}
         onToggleWatchlist={handleToggleWatchlist}
+        onToggleFavorite={handleToggleFavorite}
       />
 
       <div className="max-w-5xl mx-auto px-6 mt-6 md:mt-8">

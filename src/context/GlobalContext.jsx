@@ -44,8 +44,8 @@ const GlobalProvider = ({ children }) => {
 
   //! Caricamento iniziale dei popolari
   useEffect(() => {
-    getPopular(); 
-  }, []); 
+    getPopular();
+  }, []);
 
   /* ============================================
     ! FUNZIONI API TMDB
@@ -62,8 +62,10 @@ const GlobalProvider = ({ children }) => {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Errore nella risposta: ${res.status}`);
       const data = await res.json();
-      //! Filtra solo i risultati con popolarità > 35
-      const filteredResults = (data.results || []).filter(item => item.vote_average > 3 && item.vote_count > 10);
+      //! Filtra solo i risultati con genere non documentario (ID 99)
+      const filteredResults = (data.results || []).filter(item =>
+        !item.genre_ids || !item.genre_ids.includes(99)
+      );
       if (endpoint === "movie") {
         setMovies(filteredResults);
       } else {
@@ -159,9 +161,13 @@ const GlobalProvider = ({ children }) => {
         })
       );
 
-      //* 3) Elimina duplicati da un array di oggetti basandosi sull'id e filtra per popolarità > 35
-      const uniqueMovies = Array.from(new Map(movieItems.map((m) => [m.id, m])).values()).filter(m => m.vote_average > 3 && m.vote_count > 10);
-      const uniqueTv = Array.from(new Map(tvItems.map((t) => [t.id, t])).values()).filter(t => t.vote_average > 3 && t.vote_count > 10);
+      //* 3) Elimina duplicati da un array di oggetti basandosi sull'id e filtra i documentari (ID 99)
+      const uniqueMovies = Array.from(new Map(movieItems.map((m) => [m.id, m])).values()).filter(m =>
+        !m.genre_ids || !m.genre_ids.includes(99)
+      );
+      const uniqueTv = Array.from(new Map(tvItems.map((t) => [t.id, t])).values()).filter(t =>
+        !t.genre_ids || !t.genre_ids.includes(99)
+      );
 
       //* 4) Merge con stato esistente (evita duplicati)
       setMovies((prev) => {
