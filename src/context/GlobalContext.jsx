@@ -1,5 +1,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import useLocalStorageList from "../hooks/useLocalStorageList";
+import useSearch from "../hooks/useSearch";
+
 /* =====================================================
   ! CONFIG / COSTANTI
   ? - In produzione preferisci leggere API_URL e API_KEY da variabili d'ambiente.
@@ -16,13 +18,16 @@ const GlobalContext = createContext();
   ? - Espone le API per cercare, leggere dettagli, e gestire la watchlist (tramite hook).
    ===================================================== */
 const GlobalProvider = ({ children }) => {
-  //? Stato di lista (risultati/collezioni)
-  const [movies, setMovies] = useState([]);
-  const [series, setSeries] = useState([]);
+  //? Stato di lista (popolari)
   const [popular, setPopular] = useState([]);
 
-  //? Stato UI
-  const [isSearching, setIsSearching] = useState(false);
+  //todo Hook di ricerca (gestisce movies, series, isSearching e funzioni di ricerca)
+  const {
+    movies,
+    series,
+    isSearching,
+    search,
+  } = useSearch();
 
   //todo Watchlist (delegata al custom hook generico)
   const {
@@ -50,34 +55,6 @@ const GlobalProvider = ({ children }) => {
   /* ============================================
     ! FUNZIONI API TMDB
      ============================================ */
-  /**
-   *! getData
-   *todo Ricerca per testo su un endpoint TMDB (movie | tv) e aggiorna lo stato relativo.
-   *? @param {string} query - Testo da cercare
-   *? @param {"movie"|"tv"} endpoint - Target della ricerca
-   */
-  async function getData(query, endpoint) {
-    const url = `${apiUrl}search/${endpoint}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Errore nella risposta: ${res.status}`);
-      const data = await res.json();
-      //! Filtra solo i risultati con genere non documentario (ID 99)
-      const filteredResults = (data.results || []).filter(item =>
-        !item.genre_ids || !item.genre_ids.includes(99)
-      );
-      if (endpoint === "movie") {
-        setMovies(filteredResults);
-      } else {
-        setSeries(filteredResults);
-      }
-    } catch (error) {
-      console.error("Errore caricamento film:", error);
-    } finally {
-      //? Qui puoi eventualmente disattivare spinner specifici
-    }
-  }
-
   /**
    *! getPopular
    *todo Recupera i film popolari (prima schermata/landing).
@@ -119,99 +96,33 @@ const GlobalProvider = ({ children }) => {
   }
 
   /**
-   *! getMediaByPerson
-   *todo Ricerca per "persona" e aggiunge in lista i media correlati (movie/tv), senza duplicati.
-   *? Nota: si somma ai risultati di getData(query, "movie"/"tv").
-   *? @param {string} query - Nome persona (attori, registi, ecc.)
+   *! fetchMoviesByDirector
+   *todo Recupera tutti i film diretti da un regista specifico dato il suo ID.
+   *? @param {number} directorId - ID del regista su TMDB
+   *? @returns {Promise<Array>} - Array di film diretti dal regista
    */
-  async function getMediaByPerson(query) {
+  async function fetchMoviesByDirector(directorId) {
     try {
-      //* 1) Trova persone per query
-      const urlPerson = `${apiUrl}search/person?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
-      const resPerson = await fetch(urlPerson);
-      if (!resPerson.ok) throw new Error(`Errore persone: ${resPerson.status}`);
-      const dataPerson = await resPerson.json();
-      const persons = dataPerson.results || [];
-      //* 2) Per ogni persona, recupera crediti movie/tv in parallelo
-      const movieItems = [];
-      const tvItems = [];
+      const url = `${apiUrl}person/${directorId}/movie_credits?api_key=${apiKey}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Errore nella risposta: ${res.status}`);
+      const data = await res.json();
 
-      await Promise.all(
-        persons.map(async (person) => {
-          try {
-            const [resMovieCredits, resTvCredits] = await Promise.all([
-              fetch(`${apiUrl}person/${person.id}/movie_credits?api_key=${apiKey}`),
-              fetch(`${apiUrl}person/${person.id}/tv_credits?api_key=${apiKey}`),
-            ]);
-
-            if (resMovieCredits?.ok) {
-              const credits = await resMovieCredits.json();
-              if (credits.cast) movieItems.push(...credits.cast);
-              if (credits.crew) movieItems.push(...credits.crew);
-            }
-
-            if (resTvCredits?.ok) {
-              const credits = await resTvCredits.json();
-              if (credits.cast) tvItems.push(...credits.cast);
-              if (credits.crew) tvItems.push(...credits.crew);
-            }
-          } catch (err) {
-            console.error(`Errore crediti per la persona ${person.id}:`, err);
-          }
-        })
-      );
-
-      //* 3) Elimina duplicati da un array di oggetti basandosi sull'id e filtra i documentari (ID 99)
-      const uniqueMovies = Array.from(new Map(movieItems.map((m) => [m.id, m])).values()).filter(m =>
-        !m.genre_ids || !m.genre_ids.includes(99)
-      );
-      const uniqueTv = Array.from(new Map(tvItems.map((t) => [t.id, t])).values()).filter(t =>
-        !t.genre_ids || !t.genre_ids.includes(99)
-      );
-
-      //* 4) Merge con stato esistente (evita duplicati)
-      setMovies((prev) => {
-        const map = new Map(prev.map((p) => [p.id, p]));
-        uniqueMovies.forEach((u) => {
-          if (!map.has(u.id)) map.set(u.id, u);
+      // Filtra solo i film dove la persona è regista (job: "Director")
+      const directedMovies = (data.crew || [])
+        .filter((item) => item.job === "Director")
+        .sort((a, b) => {
+          // Ordina per data di uscita (più recenti prima)
+          const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
+          const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
+          return dateB - dateA;
         });
-        return Array.from(map.values());
-      });
 
-      setSeries((prev) => {
-        const map = new Map(prev.map((p) => [p.id, p]));
-        uniqueTv.forEach((u) => {
-          if (!map.has(u.id)) map.set(u.id, u);
-        });
-        return Array.from(map.values());
-      });
-    } catch (err) {
-      console.error("Errore getMediaByPerson:", err);
+      return directedMovies;
+    } catch (error) {
+      console.error("Errore nel caricamento dei film del regista:", error);
+      return [];
     }
-  }
-
-  /* ========================================================
-    ! API DI RICERCA (coordinamento delle chiamate)
-     ======================================================== */
-
-  /**
-   *! search
-   *todo Esegue la ricerca combinata su film, serie e persone.
-   *? - query falsy: reset risultati e stato di ricerca
-   *? - query valida: avvia tutte le chiamate e imposta isSearching=true
-   */
-  function search(query) {
-    if (!query) {
-      setMovies([]);
-      setSeries([]);
-      setIsSearching(false);
-      return;
-    }
-    //? Ricerca parallela movie/tv + media da persone
-    getData(query, "movie");
-    getData(query, "tv");
-    getMediaByPerson(query);
-    setIsSearching(true);
   }
 
   /* =========================================================
@@ -227,6 +138,7 @@ const GlobalProvider = ({ children }) => {
     //todo Azioni di ricerca/dettagli
     search,
     fetchById,
+    fetchMoviesByDirector,
 
     //todo Watchlist API (dal custom hook)
     watchlist,

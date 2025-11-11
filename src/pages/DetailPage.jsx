@@ -3,15 +3,18 @@ import { useParams } from "react-router-dom";
 import { useGlobalContext } from "../context/GlobalContext";
 import HeroDetail from "../components/HeroDetail";
 import CastComponent from "../components/CastComponent";
+import DirectorMoviesOverlay from "../components/DirectorMoviesOverlay";
 import { FiStar } from "react-icons/fi";
 
 function DetailPage() {
   const { id, type } = useParams();
-  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites } = useGlobalContext();
+  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites, fetchMoviesByDirector } = useGlobalContext();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const [showDirectorOverlay, setShowDirectorOverlay] = useState(false);
+  const [selectedDirector, setSelectedDirector] = useState(null);
 
   useEffect(() => {
     async function loadDetails() {
@@ -70,6 +73,12 @@ function DetailPage() {
     if (inList2) removeFromFavourites(type, details.id);
     else addToFavourites(details);
   }
+  const handleDirectorClick = () => {
+    if (director) {
+      setSelectedDirector(director);
+      setShowDirectorOverlay(true);
+    }
+  };
 
   return (
     <div className="text-white">
@@ -140,25 +149,40 @@ function DetailPage() {
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-300">
-                <p><strong>Tipo:</strong> {type === "movie" ? "Film" : "Serie TV"}</p>
-                <p><strong>Data di uscita:</strong> {releaseDate || "—"}</p>
-                {type === "movie" && <p><strong>Durata:</strong> {details.runtime ? `${details.runtime} min` : "—"}</p>}
-                {type === "tv" && <p><strong>Episodi:</strong> {details.number_of_episodes ?? "—"}</p>}
-                {type === "tv" && <p><strong>Stagioni:</strong> {details.number_of_seasons ?? "—"}</p>}
-                <p><strong>Lingue:</strong> {details.spoken_languages?.map((l) => l.english_name).join(", ") || "—"}</p>
-                <p><strong>Produzione:</strong> {details.production_companies?.map((p) => p.name).join(", ") || "—"}</p>
+                <p><strong>Type:</strong> {type === "movie" ? "Film" : "Serie TV"}</p>
+                <p><strong>Release Date:</strong> {releaseDate || "—"}</p>
+                {type === "movie" && <p><strong>Runtime:</strong> {details.runtime ? `${details.runtime} min` : "—"}</p>}
+                {type === "tv" && <p><strong>Episodes:</strong> {details.number_of_episodes ?? "—"}</p>}
+                {type === "tv" && <p><strong>Seasons:</strong> {details.number_of_seasons ?? "—"}</p>}
+                <p><strong>Languages:</strong> {details.spoken_languages?.map((l) => l.english_name).join(", ") || "—"}</p>
+                <p><strong>Production:</strong> {details.production_companies?.map((p) => p.name).join(", ") || "—"}</p>
                 {typeof details.budget === "number" && details.budget > 0 && (
                   <p><strong>Budget:</strong> ${details.budget.toLocaleString()}</p>
                 )}
                 {typeof details.revenue === "number" && details.revenue > 0 && (
-                  <p className={(details.budget > details.revenue) ? "text-red-500" : "text-green-500"}>
-                    <strong>Incassi:</strong> ${details.revenue.toLocaleString()}
+                  <p className={(details.budget > details.revenue) ? "text-red-500" : (!details.budget) ? "text-gray-300" : "text-green-500"}>
+                    <strong>Revenue:</strong> ${details.revenue.toLocaleString()}
                   </p>
                 )}
-                <p><strong>Stato:</strong> {details.status || "—"}</p>
-                {type === "movie" && <p><strong>Regia:</strong> {director ? director.name : "—"}</p>}
+                <p><strong>Status:</strong> {details.status || "—"}</p>
+                {type === "movie" && (
+                  <p>
+                    <strong>Director:</strong>{" "}
+                    {director ? (
+                      <button
+                        type="button"
+                        onClick={handleDirectorClick}
+                        className="text-red-500 hover:text-red-400 underline transition-colors cursor-pointer"
+                      >
+                        {director.name}
+                      </button>
+                    ) : (
+                      "—"
+                    )}
+                  </p>
+                )}
                 {type === "tv" && creators?.length > 0 && (
-                  <p><strong>Creato da:</strong> {creators.map((c) => c.name).join(", ")}</p>
+                  <p><strong>Create by:</strong> {creators.map((c) => c.name).join(", ")}</p>
                 )}
               </div>
             </div>
@@ -166,6 +190,14 @@ function DetailPage() {
           {cast.length > 0 && <CastComponent cast={cast} />}
         </div>
       </div>
+
+      {/* Overlay per i film del regista */}
+      <DirectorMoviesOverlay
+        isOpen={showDirectorOverlay}
+        onClose={() => setShowDirectorOverlay(false)}
+        director={selectedDirector}
+        fetchMoviesByDirector={fetchMoviesByDirector}
+      />
     </div>
   );
 }
