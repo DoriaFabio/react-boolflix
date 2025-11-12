@@ -22,6 +22,7 @@ function DetailPage() {
         setLoading(true);
         const data = await fetchById(type, id);
         setDetails(data);
+        console.log(data);
       } catch (err) {
         setError(err.message || "Impossibile caricare i dettagli");
       } finally {
@@ -52,8 +53,8 @@ function DetailPage() {
     return Math.max(0, Math.min(5, five));
   }, [details]);
 
-  if (loading) return <h3 className="text-center mt-10 text-3xl">Caricamento...</h3>;
-  if (error) return <h3 className="text-center mt-10 text-3xl">Errore visualizzazione dati</h3>;
+  if (loading) return <h3 className="text-center mt-10 text-3xl">Loading...</h3>;
+  if (error) return <h3 className="text-center mt-10 text-3xl">Data display error</h3>;
   if (!details) return null;
 
   const title = details.title || details.name;
@@ -129,7 +130,7 @@ function DetailPage() {
                       onClick={() => setExpanded((v) => !v)}
                       className="text-red-500 hover:text-red-400 font-semibold mt-2"
                     >
-                      {expanded ? "Mostra meno" : "Mostra altro"}
+                      {expanded ? "Show less" : "Show more"}
                     </button>
                   )}
                 </div>

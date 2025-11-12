@@ -16,15 +16,15 @@ function Favourites() {
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-4">
           <FiFilm size={24} />
         </div>
-        <h1 className="text-3xl font-extrabold mb-2">La tua lista dei preferiti è vuota</h1>
+        <h1 className="text-3xl font-extrabold mb-2">Your favorites list is empty</h1>
         <p className="text-gray-300 mb-6">
-          Aggiungi film e serie dalla pagina dettaglio per tenerli d&apos;occhio.
+          Add movies and series from detail page to keep track of them.
         </p>
         <Link
           to="/"
           className="inline-block bg-red-600 hover:bg-red-700 transition-colors px-5 py-2 rounded-full font-semibold"
         >
-          Scopri i popolari
+          Browse Movies & TV Shows
         </Link>
       </div>
     );
@@ -52,7 +52,7 @@ function Favourites() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      Nessun film/serie tv
+                      No Image
                     </div>
                   )}
                 </div>

@@ -41,7 +41,7 @@ function HeroDetail({
                             className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 transition-colors px-4 py-2 rounded-full font-semibold"
                         >
                             <FiPlay className="text-white" />
-                            Guarda trailer
+                            Watch trailer
                         </a>
                     )}
 
@@ -51,7 +51,7 @@ function HeroDetail({
                         className={"inline-flex items-center gap-2 px-4 py-2 rounded-full transition-colors bg-white/10 hover:bg-white/20"}
                     >
                         {inWatchlist ? <FiMinus /> : <FiPlus />}
-                        {inWatchlist ? "Rimuovi dalla Watchlist" : "Aggiungi a Watchlist"}
+                        {inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
                     </button>
                     <button
                         type="button"

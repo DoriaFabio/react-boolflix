@@ -32,7 +32,7 @@ export default function HandleSearch() {
       <input
         id="search"
         type="text"
-        placeholder="Cerca per titolo, regista, attore..."
+        placeholder="Search by title, director, actor..."
         onChange={(e) => debounceSearch(e.target.value)}
         className="
           bg-[#000000]

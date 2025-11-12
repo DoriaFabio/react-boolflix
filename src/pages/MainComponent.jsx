@@ -12,7 +12,7 @@ function MainComponent() {
     return (
       <main className="flex flex-col items-center text-white mt-10">
         <HandleSearch />
-        <p className="text-gray-400 mt-10">Caricamento film popolari...</p>
+        <p className="text-gray-400 mt-10">Loading popular movies...</p>
       </main>
     );
   }

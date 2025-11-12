@@ -60,6 +60,111 @@ body {
   z-index: 20;
 }
 
+/* Dots del carosello bianchi */
+.slick-dots li button:before {
+  color: white !important;
+  opacity: 0.5;
+}
+.slick-dots li.slick-active button:before {
+  color: white !important;
+  opacity: 1;
+}
+
+/* Limita i dots visibili su mobile e tablet per evitare overflow */
+@media screen and (max-width: 1024px) {
+  .slick-dots {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0 10px;
+  }
+
+  .slick-dots li {
+    margin: 0 2px;
+  }
+
+  /* Riduce la dimensione dei dots su mobile */
+  .slick-dots li button:before {
+    font-size: 6px !important;
+  }
+}
+
+/* Per schermi molto piccoli (telefoni), limita ancora di più */
+@media screen and (max-width: 480px) {
+  .slick-dots li button:before {
+    font-size: 5px !important;
+  }
+}
+
+/* Stili per i numeri invece dei dots */
+.slick-dots-with-numbers {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.slick-dots-with-numbers li {
+  margin: 0;
+  padding: 0;
+  width: auto;
+  height: auto;
+}
+
+.slick-dots-with-numbers li button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.slick-dots-with-numbers li button:before {
+  display: none !important;
+}
+
+.slick-number-button {
+  background: transparent;
+  color: gray;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.slick-number-button:hover {
+  color: white;
+  transform: scale(1.05);
+}
+
+.slick-dots-with-numbers li.slick-active .slick-number-button {
+  color: white;
+  font-weight: 600;
+}
+
+@media screen and (max-width: 480px) {
+  .slick-number-button {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .slick-dots-with-numbers li button {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 .slick-slider {
   display: block !important;
   width: 100% !important;

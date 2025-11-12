@@ -1,4 +1,4 @@
-import { useContext, createContext, useState, useEffect } from "react";
+import { useContext, createContext, useState, useEffect, useCallback } from "react";
 import useLocalStorageList from "../hooks/useLocalStorageList";
 import useSearch from "../hooks/useSearch";
 
@@ -82,18 +82,20 @@ const GlobalProvider = ({ children }) => {
    *? @param {string|number} id
    *? @returns {Promise<object>}
    */
-  async function fetchById(endpoint, id) {
+  const fetchById = useCallback(async (endpoint, id) => {
     const url = `${apiUrl}${endpoint}/${id}?api_key=${apiKey}&append_to_response=credits,videos,recommendations`;
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error("Errore nella risposta del server");
       const data = await res.json();
+      console.log(`Caricati dettagli per ${endpoint} ID: ${id}`);
+
       return data;
     } catch (err) {
       console.error("Errore caricamento dati film:", err);
       throw err;
     }
-  }
+  }, []);
 
   /**
    *! fetchMoviesByDirector
@@ -101,7 +103,7 @@ const GlobalProvider = ({ children }) => {
    *? @param {number} directorId - ID del regista su TMDB
    *? @returns {Promise<Array>} - Array di film diretti dal regista
    */
-  async function fetchMoviesByDirector(directorId) {
+  const fetchMoviesByDirector = useCallback(async (directorId) => {
     try {
       const url = `${apiUrl}person/${directorId}/movie_credits?api_key=${apiKey}`;
       const res = await fetch(url);
@@ -117,13 +119,13 @@ const GlobalProvider = ({ children }) => {
           const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
           return dateB - dateA;
         });
-
+        console.log(`Caricati ${directedMovies.length} film diretti dal regista ID: ${directorId}`);
       return directedMovies;
     } catch (error) {
       console.error("Errore nel caricamento dei film del regista:", error);
       return [];
     }
-  }
+  }, []);
 
   /* =========================================================
     ! VALORE ESPORTATO DAL CONTESTO

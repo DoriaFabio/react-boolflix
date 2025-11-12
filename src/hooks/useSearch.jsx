@@ -28,6 +28,7 @@ export default function useSearch() {
             } else {
                 setSeries(filteredResults);
             }
+            console.log(`Caricati ${filteredResults.length} ${endpoint}(s) per query: "${query}"`);
         } catch (error) {
             console.error("Errore caricamento film:", error);
         } finally {

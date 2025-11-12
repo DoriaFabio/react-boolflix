@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 
@@ -16,24 +16,28 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  async function loadDirectorMovies() {
+  // Memoizza la funzione per evitare ricreazioni inutili
+  const loadDirectorMovies = useCallback(async () => {
+    if (!director?.id) return;
+
     try {
       setLoading(true);
       const data = await fetchMoviesByDirector(director.id);
       setMovies(data);
+      console.log("Director movies loaded:", data);
     } catch (error) {
       console.error("Errore nel caricamento dei film del regista:", error);
       setMovies([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, [director?.id, fetchMoviesByDirector]);
 
   useEffect(() => {
     if (isOpen && director?.id) {
       loadDirectorMovies();
     }
-  }, [isOpen, director]);
+  }, [isOpen, director?.id, loadDirectorMovies]);
 
   const handleMovieClick = (movieId) => {
     onClose();
@@ -57,7 +61,7 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
         {/* Header */}
         <div className="sticky top-0 bg-neutral-900/95 backdrop-blur border-b border-white/10 px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white">Film diretti da</h2>
+            <h2 className="text-2xl font-bold text-white">Films directed by</h2>
             <p className="text-red-500 text-lg font-semibold">{director?.name}</p>
           </div>
           <button
@@ -74,11 +78,11 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
         <div className="overflow-y-auto max-h-[calc(80vh-88px)] p-6">
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-gray-400 text-lg">Caricamento...</p>
+              <p className="text-gray-400 text-lg">Loading...</p>
             </div>
           ) : movies.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-400 text-lg">Nessun film trovato</p>
+              <p className="text-gray-400 text-lg">No movies found</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
@@ -99,7 +103,7 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
                     ) : (
                       <div className="w-full aspect-[2/3] bg-neutral-800 flex items-center justify-center">
                         <p className="text-gray-500 text-sm px-2 text-center">
-                          Immagine non disponibile
+                          Image not available
                         </p>
                       </div>
                     )}
