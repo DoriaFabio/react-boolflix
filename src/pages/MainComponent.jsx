@@ -18,7 +18,7 @@ function MainComponent() {
   }
 
   return (
-    <main className="mx-10 py-5 flex flex-col items-center">
+    <main className="mx-5 py-5 flex flex-col items-center">
       <HandleSearch />
       {!isSearching ? (
         <ListMedia title="Popular movie" list={popular} />
