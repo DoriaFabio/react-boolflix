@@ -51,7 +51,7 @@ export default function ListMedia({ title, list }) {
             key={slidesToShow}
           >
             {list.map((media) => (
-              <div key={media.id} className="px-2 flex justify-center">
+              <div key={media.id} className="flex justify-center">
                 <CardMovies media={media} />
               </div>
             ))}

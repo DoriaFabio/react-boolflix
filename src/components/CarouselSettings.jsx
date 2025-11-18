@@ -71,7 +71,7 @@ export function getCarouselSettings(width) {
         // Se ci sono pochi dots, mostra tutti
         if (dots.length <= maxDots) {
           return (
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-2">
               <ul className="slick-dots-with-numbers">{dots}</ul>
             </div>
           );

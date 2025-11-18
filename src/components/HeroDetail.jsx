@@ -38,7 +38,7 @@ function HeroDetail({
                             href={`https://www.youtube.com/watch?v=${trailerKey}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 transition-colors px-4 py-2 rounded-full font-semibold"
+                            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded-full font-semibold text-[12px] md:text-[16px]"
                         >
                             <FiPlay className="text-white" />
                             Watch trailer
@@ -48,7 +48,7 @@ function HeroDetail({
                     <button
                         type="button"
                         onClick={onToggleWatchlist}
-                        className={"inline-flex items-center gap-2 px-4 py-2 rounded-full transition-colors bg-white/10 hover:bg-white/20"}
+                        className={"inline-flex items-center gap-2 px-2 py-2 md:px-4 rounded-full transition-colors bg-white/10 hover:bg-white/20 text-[12px] md:text-[16px]"}
                     >
                         {inWatchlist ? <FiMinus /> : <FiPlus />}
                         {inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
@@ -56,7 +56,7 @@ function HeroDetail({
                     <button
                         type="button"
                         onClick={onToggleFavorite}
-                        className={"inline-flex items-center gap-2 px-4 py-2 rounded-full transition-colors bg-white/10 hover:bg-white/20"}>
+                        className={"inline-flex items-center gap-2 px-2 py-2 md:px-3 md:py-3 rounded-full transition-colors bg-white/10 hover:bg-white/20 text-[12px] md:text-[16px]"}>
                             {inFavourite ? <FaHeart className="text-red-500" /> : <FiHeart className="text-red-500"/>}
                     </button>
                 </div>

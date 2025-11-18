@@ -94,7 +94,7 @@ function DetailPage() {
         onToggleFavorite={handleToggleFavorite}
       />
 
-      <div className="max-w-5xl mx-auto px-6 mt-6 md:mt-8">
+      <div className="max-w-5xl mx-auto px-6 mt-4 md:mt-4">
         <div className="bg-black/60 backdrop-blur rounded-2xl shadow-xl border border-white/10 p-5">
           <div className="flex flex-col md:flex-row items-start gap-6">
             {details.poster_path && (
