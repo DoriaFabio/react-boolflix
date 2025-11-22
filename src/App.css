@@ -46,9 +46,9 @@ body {
   z-index: 10; /* 👈 porta quella in hover in primo piano */
 }
 
-.slick-prev:before,
+/* .slick-prev:before,
 .slick-next:before {
-  color: #f59e0b; /* giallo ambra Tailwind */
+  color: #f59e0b; 
   font-size: 30px;
 }
 .slick-prev {
@@ -58,7 +58,7 @@ body {
 .slick-next {
   right: -40px;
   z-index: 20;
-}
+} */
 
 /* Dots del carosello bianchi */
 .slick-dots li button:before {
@@ -179,3 +179,26 @@ body {
   padding: 10px;
 }
 
+/* Scrollbar personalizzata - rosso su sfondo nero */
+/* Per browser WebKit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dc2626;
+  border-radius: 10px;
+  border: 2px solid #000000;
+}
+
+/* Per Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #dc2626 #000000;
+}
