@@ -30,35 +30,39 @@ body {
     }
 }
 
-.slick-slide > div {
-  margin: 0 4px;
+/* === SLICK CAROUSEL STYLES === */
+
+/* Container e slide */
+.slick-slider {
+  display: block !important;
+  width: 100% !important;
 }
+
+.slick-track {
+  display: flex !important;
+  align-items: center;
+}
+
 .slick-list {
-  overflow-x: hidden !important;  /* 👈 blocca i lati */
-  overflow-y: clip !important; /* 👈 libera sopra/sotto */
+  overflow-x: hidden !important;
+  overflow-y: clip !important;
 }
 
 .slick-slide {
   transition: transform 0.3s ease;
   z-index: 1;
 }
+
 .slick-slide:hover {
-  z-index: 10; /* 👈 porta quella in hover in primo piano */
+  z-index: 10;
 }
 
-/* .slick-prev:before,
-.slick-next:before {
-  color: #f59e0b; 
-  font-size: 30px;
+.slick-slide > div {
+  margin: 0 4px;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
 }
-.slick-prev {
-  left: -40px;
-  z-index: 20;
-}
-.slick-next {
-  right: -40px;
-  z-index: 20;
-} */
 
 /* Dots del carosello bianchi */
 .slick-dots li button:before {
@@ -165,25 +169,11 @@ body {
   }
 }
 
-.slick-slider {
-  display: block !important;
-  width: 100% !important;
-}
-.slick-track {
-  display: flex !important;
-  align-items: center;
-}
-.slick-slide > div {
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-}
-
 /* Scrollbar personalizzata - rosso su sfondo nero */
 /* Per browser WebKit (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -195,6 +185,10 @@ body {
   background: #dc2626;
   border-radius: 10px;
   border: 2px solid #000000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ef4444;
 }
 
 /* Per Firefox */

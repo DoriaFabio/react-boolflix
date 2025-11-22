@@ -2,8 +2,34 @@ import { useEffect, useRef, useState } from "react";
 import CardMovies from "./CardMovies";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { useWindowWidth, getCarouselSettings, getSlidesToShow } from "./CarouselSettings";
+import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+
+// Freccia precedente personalizzata
+function PrevArrow({ onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="absolute left-[-40px] top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-red-600 rounded-full transition-all duration-300 group"
+      aria-label="Previous"
+    >
+      <IoChevronBack className="text-white text-2xl group-hover:scale-110 transition-transform" />
+    </button>
+  );
+}
+
+// Freccia successiva personalizzata
+function NextArrow({ onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="absolute right-[-40px] top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-red-600 rounded-full transition-all duration-300 group"
+      aria-label="Next"
+    >
+      <IoChevronForward className="text-white text-2xl group-hover:scale-110 transition-transform" />
+    </button>
+  );
+}
 
 export default function ListMedia({ title, list }) {
   const [mounted, setMounted] = useState(false);
@@ -11,8 +37,15 @@ export default function ListMedia({ title, list }) {
   const width = useWindowWidth();
 
   // Ottieni le impostazioni del carosello dal file separato
-  const settings = getCarouselSettings(width);
+  const baseSettings = getCarouselSettings(width);
   const slidesToShow = getSlidesToShow(width);
+
+  // Aggiungi le frecce personalizzate alle impostazioni
+  const settings = {
+    ...baseSettings,
+    prevArrow: <PrevArrow />,
+    nextArrow: <NextArrow />,
+  };
 
   // Monta lo slider solo quando ci sono dati e dopo che il layout è pronto
   useEffect(() => {
