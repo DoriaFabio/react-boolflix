@@ -25,7 +25,7 @@ function MainComponent() {
       ) : (
         <>
           <ListMedia title="Movies" list={movies} />
-          <ListMedia title="Serie tv" list={series} />
+          <ListMedia title="Tv series" list={series} />
         </>
       )}
     </main>

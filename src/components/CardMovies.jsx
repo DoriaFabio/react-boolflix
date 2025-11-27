@@ -4,16 +4,16 @@ import { FaStar, FaRegStar } from "react-icons/fa";
 import { useMemo } from "react";
 
 const imgPath = "https://image.tmdb.org/t/p/w342";
-const flags = ["de", "en", "es", "it", "fr", "ja", "ko"];
+// const flags = ["de", "en", "es", "it", "fr", "ja", "ko"];
 
 export default function CardMovies({ media }) {
   // Memoizza il calcolo della bandiera
-  const flag = useMemo(() =>
-    flags.includes(media.original_language)
-      ? media.original_language + ".png"
-      : "placeholder.jpg",
-    [media.original_language]
-  );
+  // const flag = useMemo(() =>
+  //   flags.includes(media.original_language)
+  //     ? media.original_language + ".png"
+  //     : "placeholder.jpg",
+  //   [media.original_language]
+  // );
 
   const type = media.title ? "movie" : "tv";
 
@@ -63,7 +63,7 @@ export default function CardMovies({ media }) {
           </p>
 
           <div className="flex flex-col items-center gap-2">
-            <img src={flag} alt={flag} className={`${style.flag} w-8 h-auto rounded`} />
+            {/* <img src={flag} alt={flag} className={`${style.flag} w-8 h-auto rounded`} /> */}
             <div className="text-amber-300 flex justify-center">{stars}</div>
           </div>
         </div>

@@ -48,6 +48,9 @@ export function getCarouselSettings(width) {
   const slidesToScroll = getSlidesToScroll(slidesToShow);
   const dotsClass = getDotsClass(width);
 
+  // Determina il numero massimo di dots in base alla larghezza
+  const maxDots = width < 768 ? 4 : width < 1024 ? 6 : 10;
+
   const settings = {
     dots: true,
     dotsClass,
@@ -58,66 +61,69 @@ export function getCarouselSettings(width) {
     slidesToScroll,
     arrows: true,
     swipeToSlide: true,
-    // Su mobile/tablet mostra numeri invece di dots con contatore
+    // Su mobile/tablet mostra numeri invece di dots
     ...(width < 1024 && {
       customPaging: (i) => {
         return <div className="slick-number-button">{i + 1}</div>;
       },
-      appendDots: (dots) => {
-        // Mostra massimo 4 numeri alla volta
-        const maxDots = 4;
-        const halfMax = Math.floor(maxDots / 2);
+    }),
+    // Limita i dots visibili su tutti i dispositivi
+    appendDots: (dots) => {
+      const halfMax = Math.floor(maxDots / 2);
 
-        // Se ci sono pochi dots, mostra tutti
-        if (dots.length <= maxDots) {
-          return (
-            <div className="flex items-center justify-center gap-2">
-              <ul className="slick-dots-with-numbers">{dots}</ul>
-            </div>
-          );
-        }
-
-        // Trova l'indice del dot attivo
-        const activeIndex = dots.findIndex(
-          (dot) =>
-            dot.props.className && dot.props.className.includes("slick-active")
-        );
-
-        // Se non troviamo il dot attivo, mostra tutti
-        if (activeIndex === -1) {
-          return (
-            <div className="flex items-center justify-center gap-3">
-              <ul className="slick-dots-with-numbers">{dots}</ul>
-            </div>
-          );
-        }
-
-        // Calcola il range di numeri da mostrare
-        let start = Math.max(0, activeIndex - halfMax);
-        let end = Math.min(dots.length, start + maxDots);
-
-        // Aggiusta se siamo vicini alla fine
-        if (end === dots.length) {
-          start = Math.max(0, end - maxDots);
-        }
-
-        const visibleDots = dots.slice(start, end);
-
-        // Calcola quanti risultati mancano da visualizzare
-        const remaining = dots.length - (activeIndex + 2);
-
+      // Se ci sono pochi dots, mostra tutti
+      if (dots.length <= maxDots) {
         return (
-          <div className="flex items-center justify-center gap-3">
-            <ul className="slick-dots-with-numbers">{visibleDots}</ul>
-            {remaining > 0 && (
-              <span className="text-white/70 text-xs font-medium whitespace-nowrap pl-3 pt-2">
-                +{remaining}
-              </span>
-            )}
+          <div className="flex items-center justify-center flex-nowrap">
+            <ul className={width < 1024 ? "slick-dots-with-numbers" : ""}>{dots}</ul>
           </div>
         );
-      },
-    }),
+      }
+
+      // Trova l'indice del dot attivo
+      const activeIndex = dots.findIndex(
+        (dot) =>
+          dot.props.className && dot.props.className.includes("slick-active")
+      );
+
+      // Se non troviamo il dot attivo, mostra i primi maxDots
+      if (activeIndex === -1) {
+        const visibleDots = dots.slice(0, maxDots);
+        return (
+          <div className="flex items-center justify-center flex-nowrap gap-1">
+            <ul className={width < 1024 ? "slick-dots-with-numbers" : ""}>{visibleDots}</ul>
+            <span className="text-white/70 text-xs font-medium whitespace-nowrap ml-2">
+              +{dots.length - maxDots}
+            </span>
+          </div>
+        );
+      }
+
+      // Calcola il range di numeri da mostrare
+      let start = Math.max(0, activeIndex - halfMax);
+      let end = Math.min(dots.length, start + maxDots);
+
+      // Aggiusta se siamo vicini alla fine
+      if (end === dots.length) {
+        start = Math.max(0, end - maxDots);
+      }
+
+      const visibleDots = dots.slice(start, end);
+
+      // Calcola quanti risultati mancano da visualizzare
+      const remaining = dots.length - (activeIndex + 2);
+
+      return (
+        <div className="flex items-center justify-center flex-nowrap gap-1">
+          <ul className={width < 1024 ? "slick-dots-with-numbers" : ""}>{visibleDots}</ul>
+          {remaining > 0 && (
+            <span className="text-white/70 text-xs font-medium ml-2">
+              +{remaining}
+            </span>
+          )}
+        </div>
+      );
+    },
   };
 
   return settings;

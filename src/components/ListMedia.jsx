@@ -74,8 +74,8 @@ export default function ListMedia({ title, list }) {
         <h3 className="myh3">{title}</h3>
       </div>
 
-      {/* wrapper con larghezza garantita */}
-      <div className="relative w-full min-w-0 p-3 m-1">
+      {/* wrapper con larghezza garantita e spazio per i dots */}
+      <div className="relative w-full min-w-0 px-3 pb-12 pt-3 mx-1">
         {mounted && (
           <Slider
             ref={sliderRef}

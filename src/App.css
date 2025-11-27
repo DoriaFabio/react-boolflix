@@ -65,6 +65,14 @@ body {
 }
 
 /* Dots del carosello bianchi */
+.slick-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+}
+
 .slick-dots li button:before {
   color: white !important;
   opacity: 0.5;
