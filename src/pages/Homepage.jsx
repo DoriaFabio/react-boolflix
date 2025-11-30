@@ -2,7 +2,7 @@ import { useGlobalContext } from "../context/GlobalContext"
 import ListMedia from "../components/ListMedia"
 import HandleSearch from "../components/handleSearch";
 
-function MainComponent() {
+function Homepage() {
   const { movies, series, isSearching, popular } = useGlobalContext();
   console.log(movies);
   console.log(series);
@@ -32,4 +32,4 @@ function MainComponent() {
   );
 }
 
-export default MainComponent
+export default Homepage;

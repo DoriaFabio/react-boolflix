@@ -1,16 +1,26 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiBookmark } from "react-icons/fi"; // icona da react-icons
+import { useGlobalContext } from "../context/GlobalContext";
 
 function HeaderComponent() {
+  const { getPopular, search } = useGlobalContext();
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    search(""); // Reset della ricerca
+    getPopular(); // Ricarica i film popolari
+    navigate("/"); // Torna alla home
+  };
+
   return (
     <header className="flex justify-between items-center text-white bg-black shadow-md px-5 py-4">
-      <Link to="/">
+      <button onClick={handleLogoClick} className="cursor-pointer bg-transparent border-none p-0">
         <img
           src="../Netflix_logo.png"
           alt="Logo Netflix"
           className="w-[100px] md:w-[150px] h-auto transition-transform hover:scale-105"
         />
-      </Link>
+      </button>
       <div className="flex">
         <Link
           to="/favourites"

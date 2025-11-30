@@ -5,11 +5,13 @@ import HeroDetail from "../components/HeroDetail";
 import CastComponent from "../components/CastComponent";
 import DirectorMoviesOverlay from "../components/DirectorMoviesOverlay";
 import { FiStar } from "react-icons/fi";
+import Recommend from "../components/Recommend";
 
 function DetailPage() {
   const { id, type } = useParams();
-  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites, fetchMoviesByDirector } = useGlobalContext();
+  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites, fetchMoviesByDirector, fetchByWatch } = useGlobalContext();
   const [details, setDetails] = useState(null);
+  const [results, setResults] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(false);
@@ -22,6 +24,7 @@ function DetailPage() {
         setLoading(true);
         const data = await fetchById(type, id);
         setDetails(data);
+        setResults(await fetchByWatch(type, id));
         console.log(data);
       } catch (err) {
         setError(err.message || "Impossibile caricare i dettagli");
@@ -30,7 +33,7 @@ function DetailPage() {
       }
     }
     loadDetails();
-  }, [id, type, fetchById]);
+  }, [id, type, fetchById, fetchByWatch]);
 
   const trailer = details?.videos?.results?.find(
     (v) => v.type === "Trailer" && v.site === "YouTube"
@@ -45,6 +48,11 @@ function DetailPage() {
       .slice()
       .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
       .slice(0, 12);
+  }, [details]);
+
+  const recommendations = useMemo(() => {
+    if (!details?.recommendations?.results) return [];
+    return details.recommendations.results.slice(0, 10);
   }, [details]);
 
   const stars = useMemo(() => {
@@ -165,7 +173,7 @@ function DetailPage() {
                     <strong>Revenue:</strong> ${details.revenue.toLocaleString()}
                   </p>
                 )}
-                <p><strong>Status:</strong> {details.status || "—"}</p>
+                <p><strong>Streaming:</strong> {results?.results?.IT?.flatrate?.map((r) => r.provider_name).join(", ") || "—"}</p>
                 {type === "movie" && (
                   <p>
                     <strong>Director:</strong>{" "}
@@ -189,6 +197,7 @@ function DetailPage() {
             </div>
           </div>
           {cast.length > 0 && <CastComponent cast={cast} />}
+          {recommendations.length > 0 && <Recommend recommendations={recommendations} />}
         </div>
       </div>
 

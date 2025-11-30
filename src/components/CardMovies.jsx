@@ -34,8 +34,8 @@ export default function CardMovies({ media }) {
     media.poster_path
       ? `${imgPath}${media.poster_path}`
       : media.backdrop_path
-      ? `${imgPath}${media.backdrop_path}`
-      : "../placeholder.jpg",
+        ? `${imgPath}${media.backdrop_path}`
+        : "../placeholder.jpg",
     [media.poster_path, media.backdrop_path]
   );
 
@@ -62,10 +62,16 @@ export default function CardMovies({ media }) {
             {media.overview}
           </p>
 
+          <p className="text-white text-sm mb-3 myfont line-clamp-4">
+            Release Date: {media.release_date || media.first_air_date}
+          </p>
+
           <div className="flex flex-col items-center gap-2">
             {/* <img src={flag} alt={flag} className={`${style.flag} w-8 h-auto rounded`} /> */}
             <div className="text-amber-300 flex justify-center">{stars}</div>
           </div>
+
+
         </div>
       </div>
     </Link>

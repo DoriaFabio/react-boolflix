@@ -119,11 +119,30 @@ const GlobalProvider = ({ children }) => {
           const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
           return dateB - dateA;
         });
-        console.log(`Caricati ${directedMovies.length} film diretti dal regista ID: ${directorId}`);
+      console.log(`Caricati ${directedMovies.length} film diretti dal regista ID: ${directorId}`);
       return directedMovies;
     } catch (error) {
       console.error("Errore nel caricamento dei film del regista:", error);
       return [];
+    }
+  }, []);
+
+  //! fetchByWatch
+  //todo Recupera i provider di visione per un media specifico
+  //? @param {"movie"|"tv"} endpoint
+  //? @param {string|number} id
+  //? @returns {Promise<object>}
+
+  const fetchByWatch = useCallback(async (endpoint, id) => {
+    try {
+      const url = `${apiUrl}${endpoint}/${id}/watch/providers?api_key=${apiKey}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Errore nella risposta del server");
+      const data = await res.json();
+      console.log(`Caricati dettagli per ${endpoint} ID: ${id}`);
+      return data;
+    } catch (error) {
+      console.error("Errore nel caricamento dei provider di visione:", error);
     }
   }, []);
 
@@ -139,8 +158,10 @@ const GlobalProvider = ({ children }) => {
 
     //todo Azioni di ricerca/dettagli
     search,
+    getPopular,
     fetchById,
     fetchMoviesByDirector,
+    fetchByWatch,
 
     //todo Watchlist API (dal custom hook)
     watchlist,
