@@ -33,7 +33,6 @@
 
 .cardImg:hover {
     box-shadow: 1px 1px 5px 7px rgb(21, 21, 21);
-    transform: scale(1.03);
 
     .cardContent {
         opacity: 1;
