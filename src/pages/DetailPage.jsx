@@ -4,12 +4,13 @@ import { useGlobalContext } from "../context/GlobalContext";
 import HeroDetail from "../components/HeroDetail";
 import CastComponent from "../components/CastComponent";
 import DirectorMoviesOverlay from "../components/DirectorMoviesOverlay";
+import ActorOverlay from "../components/ActorOverlay";
 import { FiStar } from "react-icons/fi";
 import Recommend from "../components/Recommend";
 
 function DetailPage() {
   const { id, type } = useParams();
-  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites, fetchMoviesByDirector, fetchByWatch } = useGlobalContext();
+  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites, fetchMoviesByDirector, fetchByWatch, fetchPerson } = useGlobalContext();
   const [details, setDetails] = useState(null);
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(true);
@@ -17,6 +18,8 @@ function DetailPage() {
   const [expanded, setExpanded] = useState(false);
   const [showDirectorOverlay, setShowDirectorOverlay] = useState(false);
   const [selectedDirector, setSelectedDirector] = useState(null);
+  const [showActorOverlay, setShowActorOverlay] = useState(false);
+  const [selectedActor, setSelectedActor] = useState(null);
 
   useEffect(() => {
     async function loadDetails() {
@@ -87,6 +90,11 @@ function DetailPage() {
       setSelectedDirector(director);
       setShowDirectorOverlay(true);
     }
+  };
+
+  const handleActorClick = (actor) => {
+    setSelectedActor(actor);
+    setShowActorOverlay(true);
   };
 
   return (
@@ -196,7 +204,7 @@ function DetailPage() {
               </div>
             </div>
           </div>
-          {cast.length > 0 && <CastComponent cast={cast} />}
+          {cast.length > 0 && <CastComponent cast={cast} onActorClick={handleActorClick} />}
           {recommendations.length > 0 && <Recommend recommendations={recommendations} />}
         </div>
       </div>
@@ -207,6 +215,14 @@ function DetailPage() {
         onClose={() => setShowDirectorOverlay(false)}
         director={selectedDirector}
         fetchMoviesByDirector={fetchMoviesByDirector}
+      />
+
+      {/* Overlay per i dettagli dell'attore */}
+      <ActorOverlay
+        isOpen={showActorOverlay}
+        onClose={() => setShowActorOverlay(false)}
+        actor={selectedActor}
+        fetchPerson={fetchPerson}
       />
     </div>
   );

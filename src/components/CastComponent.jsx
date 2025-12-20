@@ -1,11 +1,15 @@
-function CastComponent({ cast }) {
+function CastComponent({ cast, onActorClick }) {
     return (
         <div className="mt-8">
             <h3 className="text-2xl font-semibold mb-3">🎭 Main cast </h3>
             <div className="flex gap-4 overflow-x-auto pb-2 snap-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {cast.map((p) => (
-                    <div key={p.cast_id ?? p.credit_id ?? p.id} className="min-w-[120px] snap-start">
-                        <div className="w-[120px] h-[170px] bg-neutral-800 rounded-lg overflow-hidden">
+                    <div
+                        key={p.cast_id ?? p.credit_id ?? p.id}
+                        className="min-w-[120px] snap-start group cursor-pointer"
+                        onClick={() => onActorClick(p)}
+                    >
+                        <div className="w-[120px] h-[170px] bg-neutral-800 rounded-lg overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
                             {p.profile_path ? (
                                 <img
                                     src={`https://image.tmdb.org/t/p/w200${p.profile_path}`}
@@ -19,7 +23,7 @@ function CastComponent({ cast }) {
                                 </div>
                             )}
                         </div>
-                        <p className="mt-2 font-semibold text-sm">{p.name}</p>
+                        <p className="mt-2 font-semibold text-sm group-hover:text-red-500 transition-colors">{p.name}</p>
                         <p className="text-xs text-gray-400">{p.character}</p>
                     </div>
                 ))}

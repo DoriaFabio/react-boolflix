@@ -27,8 +27,8 @@ export default function Recommend({ recommendations }) {
             </div>
 
             <div className="p-3">
-              <p className="font-semibold text-sm line-clamp-1">{p.title}</p>
-              <p className="text-xs text-gray-400">{p.release_date}</p>
+              <p className="font-semibold text-sm line-clamp-1">{p.title || p.name}</p>
+              <p className="text-xs text-gray-400">{p.release_date || p.first_air_date}</p>
             </div>
 
             {/* Overlay on hover */}

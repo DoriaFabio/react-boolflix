@@ -146,6 +146,19 @@ const GlobalProvider = ({ children }) => {
     }
   }, []);
 
+  const fetchPerson = useCallback(async (personId) => {
+    try {
+      const url = `${apiUrl}person/${personId}?api_key=${apiKey}&append_to_response=movie_credits,tv_credits`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Errore nella risposta del server");
+      const data = await res.json();
+      console.log(`Caricati dettagli per persona ID: ${personId}`);
+      return data;
+    } catch (err) {
+      console.error("Errore nel caricamento dell'attore:", err);
+    }
+  }, [])
+
   /* =========================================================
     ! VALORE ESPORTATO DAL CONTESTO
      ========================================================= */
@@ -162,6 +175,7 @@ const GlobalProvider = ({ children }) => {
     fetchById,
     fetchMoviesByDirector,
     fetchByWatch,
+    fetchPerson,
 
     //todo Watchlist API (dal custom hook)
     watchlist,
