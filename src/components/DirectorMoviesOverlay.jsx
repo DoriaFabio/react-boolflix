@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 
 /**
- * DirectorMoviesOverlay
- * Overlay modale che mostra tutti i film diretti da un regista specifico
+ *! DirectorMoviesOverlay
+ *? Overlay modale che mostra tutti i film diretti da un regista specifico
  *
  * @param {boolean} isOpen - Controlla la visibilità dell'overlay
  * @param {function} onClose - Callback per chiudere l'overlay
@@ -23,7 +23,7 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
     try {
       setLoading(true);
       const data = await fetchMoviesByDirector(director.id);
-      setMovies(data);
+      setMovies(data.filter((m) => !m.genre_ids?.includes(10767)));
       console.log("Director movies loaded:", data);
     } catch (error) {
       console.error("Errore nel caricamento dei film del regista:", error);
@@ -39,9 +39,10 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
     }
   }, [isOpen, director?.id, loadDirectorMovies]);
 
-  const handleMovieClick = (movieId) => {
+  const handleItemClick = (item) => {
     onClose();
-    navigate(`/movie/${movieId}`);
+    const type = item.media_type === "tv" ? "tv" : "movie";
+    navigate(`/${type}/${item.id}`);
   };
 
   const handleBackdropClick = (e) => {
@@ -86,39 +87,43 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
-              {movies.map((movie) => (
-                <div
-                  key={movie.id}
-                  className="group cursor-pointer"
-                  onClick={() => handleMovieClick(movie.id)}
-                >
-                  <div className="relative overflow-hidden rounded-lg shadow-lg transition-all duration-500 group-hover:scale-105">
-                    {movie.poster_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                        alt={movie.title}
-                        className="w-full h-auto object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full aspect-[2/3] bg-neutral-800 flex items-center justify-center">
-                        <p className="text-gray-500 text-sm px-2 text-center">
-                          Image not available
-                        </p>
-                      </div>
+              {movies.map((movie) => {
+                const title = movie.title || movie.name;
+                const date = movie.release_date || movie.first_air_date;
+                return (
+                  <div
+                    key={movie.id}
+                    className="group cursor-pointer"
+                    onClick={() => handleItemClick(movie)}
+                  >
+                    <div className="relative overflow-hidden rounded-lg shadow-lg transition-all duration-500 group-hover:scale-105">
+                      {movie.poster_path ? (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                          alt={title}
+                          className="w-full h-auto object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full aspect-[2/3] bg-neutral-800 flex items-center justify-center">
+                          <p className="text-gray-500 text-sm px-2 text-center">
+                            Image not available
+                          </p>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <h3 className="text-white text-sm font-medium mt-2 line-clamp-2 group-hover:text-red-500 transition-colors">
+                      {title}
+                    </h3>
+                    {date && (
+                      <p className="text-gray-400 text-xs mt-1">
+                        {new Date(date).getFullYear()}
+                      </p>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <h3 className="text-white text-sm font-medium mt-2 line-clamp-2 group-hover:text-red-500 transition-colors">
-                    {movie.title}
-                  </h3>
-                  {movie.release_date && (
-                    <p className="text-gray-400 text-xs mt-1">
-                      {new Date(movie.release_date).getFullYear()}
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

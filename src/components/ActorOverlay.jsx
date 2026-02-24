@@ -17,7 +17,7 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Calcola l'età dalla data di nascita
+  //* Calcola l'età dalla data di nascita
   const calculateAge = (birthday) => {
     if (!birthday) return null;
     const birthDate = new Date(birthday);
@@ -30,7 +30,7 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
     return age;
   };
 
-  // Formatta la data in formato leggibile
+  //* Formatta la data in formato leggibile
   const formatDate = (dateString) => {
     if (!dateString) return null;
     const date = new Date(dateString);
@@ -41,7 +41,7 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
     });
   };
 
-  // Carica i dettagli dell'attore
+  //* Carica i dettagli dell'attore
   const loadActorDetails = useCallback(async () => {
     if (!actor?.id) return;
 
@@ -58,6 +58,7 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
     }
   }, [actor?.id, fetchPerson]);
 
+  //* Ricarica i dettagli ogni volta che l'overlay si apre o cambia l'attore
   useEffect(() => {
     if (isOpen && actor?.id) {
       loadActorDetails();
@@ -66,11 +67,12 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
 
   const handleMovieClick = (movie) => {
     onClose();
-    // Determina se è un film o una serie TV
+    //todo Determina se è un film o una serie TV
     const type = movie.media_type === "tv" ? "tv" : "movie";
     navigate(`/${type}/${movie.id}`);
   };
-
+ 
+  //todo Gestione click sul backdrop per chiudere l'overlay
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -79,14 +81,16 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
 
   if (!isOpen) return null;
 
-  // Combina film e serie TV, ordina per popolarità e prende i primi 10
+  //! Combina film e serie TV, ordina per popolarità e prende i primi 10
   const getTopCredits = () => {
     if (!personData) return [];
 
-    const movies = personData.movie_credits?.cast || [];
-    const tvShows = personData.tv_credits?.cast || [];
+    const movies = (personData.movie_credits?.cast || []).map((c) => ({ ...c, media_type: "movie" }));
+    const tvShows = (personData.tv_credits?.cast || []).map((c) => ({ ...c, media_type: "tv" }));
+    const genereIdsToExclude = [10767, 10764, 10763, 99]; // Reality, Talk Show, News, Documentaries
 
     const allCredits = [...movies, ...tvShows]
+      .filter((c) => !c.genre_ids?.some(g => genereIdsToExclude.includes(g)))
       .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
       .slice(0, 10);
 
@@ -158,10 +162,16 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
                           <p className="text-white font-medium">{formatDate(personData.birthday)}</p>
                         </div>
                       )}
-                      {age && (
+                      {(age && !personData.deathday) && (
                         <div>
                           <p className="text-gray-400">Age</p>
                           <p className="text-white font-medium">{age}</p>
+                        </div>
+                      )}
+                      {personData.deathday && (
+                        <div>
+                          <p className="text-gray-400">Date of Death</p>
+                          <p className="text-white font-medium">{formatDate(personData.deathday)}</p>
                         </div>
                       )}
                       {personData.place_of_birth && (
@@ -188,7 +198,7 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
               {/* Sezione Filmografia */}
               <div>
                 <h3 className="text-xl font-bold text-white mb-4">
-                  Popular films & TV Shows
+                  Popular films & TV Series
                 </h3>
                 {topCredits.length === 0 ? (
                   <p className="text-gray-400 text-center py-8">Film not found</p>

@@ -14,10 +14,11 @@ export default function ParallaxCarousel({ list }) {
     const updateSlidesPerView = () => {
       const width = window.innerWidth;
       setWindowWidth(width);
-      if (width < 640) setSlidesPerView(1);
-      else if (width < 1024) setSlidesPerView(2);
-      else if (width < 1280) setSlidesPerView(3);
-      else if (width < 1536) setSlidesPerView(4);
+      if (width < 450) setSlidesPerView(1);
+      else if (width < 640) setSlidesPerView(2);
+      else if (width < 800) setSlidesPerView(3);
+      else if (width < 1024) setSlidesPerView(4);
+      else if (width > 1550) setSlidesPerView(7);
       else setSlidesPerView(5);
     };
 
@@ -34,12 +35,13 @@ export default function ParallaxCarousel({ list }) {
     const targetX = -currentIndex * cardWidth;
 
     animate(x, targetX, {
-      type: "spring",
-      stiffness: 300,
-      damping: 30
+      type: "tween",
+      duration: 0.4,
+      ease: "easeInOut"
     });
   }, [currentIndex, slidesPerView, x]);
 
+  // Gestione click frecce e swipe
   const handleNext = () => {
     setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
   };
@@ -48,21 +50,22 @@ export default function ParallaxCarousel({ list }) {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
-  const handleDragEnd = (event, info) => {
-    const threshold = 50;
-    const velocity = info.velocity.x;
-    const offset = info.offset.x;
+  // Gestione swipe con threshold e velocity
+  // const handleDragEnd = (event, info) => {
+  //   const threshold = 50;
+  //   const velocity = info.velocity.x;
+  //   const offset = info.offset.x;
 
-    if (offset < -threshold || velocity < -500) {
-      if (currentIndex < maxIndex) {
-        setCurrentIndex(currentIndex + 1);
-      }
-    } else if (offset > threshold || velocity > 500) {
-      if (currentIndex > 0) {
-        setCurrentIndex(currentIndex - 1);
-      }
-    }
-  };
+  //   if (offset < -threshold || velocity < -500) {
+  //     if (currentIndex < maxIndex) {
+  //       setCurrentIndex(currentIndex + 1);
+  //     }
+  //   } else if (offset > threshold || velocity > 500) {
+  //     if (currentIndex > 0) {
+  //       setCurrentIndex(currentIndex - 1);
+  //     }
+  //   }
+  // };
 
   // Calcola quali dots mostrare in mobile
   const getVisibleDots = () => {
@@ -73,9 +76,9 @@ export default function ParallaxCarousel({ list }) {
       return Array.from({ length: totalDots }, (_, i) => i);
     }
 
-    const half = Math.floor(maxDotsToShow / 2);
-    let start = Math.max(0, currentIndex - half);
-    let end = Math.min(totalDots, start + maxDotsToShow);
+    const half = Math.floor(maxDotsToShow / 2); // numero di dots da mostrare prima e dopo il currentIndex
+    let start = Math.max(0, currentIndex - half); 
+    let end = Math.min(totalDots, start + maxDotsToShow); 
 
     if (end === totalDots) {
       start = Math.max(0, end - maxDotsToShow);
@@ -124,19 +127,19 @@ export default function ParallaxCarousel({ list }) {
       {/* Carousel container */}
       <div className="overflow-hidden px-16">
         <motion.div
-          className="flex cursor-grab active:cursor-grabbing"
+          className="flex"
           style={{
             x: useTransform(x, (value) => `${value}%`)
           }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.1}
-          onDragEnd={handleDragEnd}
         >
           {list.map((media, index) => {
             const relativePosition = index - currentIndex;
             const distance = Math.abs(relativePosition);
-            const isVisible = index >= currentIndex - 1 && index < currentIndex + slidesPerView + 1;
+            const isVisible = index >= currentIndex - 1 && index < currentIndex + slidesPerView + 1; 
+
+            const isEdgeBlur =
+              relativePosition === -1 ||
+              relativePosition === slidesPerView;
 
             return (
               <CarouselCard
@@ -146,6 +149,7 @@ export default function ParallaxCarousel({ list }) {
                 distance={distance}
                 relativePosition={relativePosition}
                 isVisible={isVisible}
+                isEdgeBlur={isEdgeBlur}
                 slidesPerView={slidesPerView}
               />
             );
@@ -162,11 +166,10 @@ export default function ParallaxCarousel({ list }) {
           <button
             key={dotIndex}
             onClick={() => setCurrentIndex(dotIndex)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              dotIndex === currentIndex
-                ? "bg-red-600 w-8"
-                : "bg-white/30 w-2 hover:bg-white/50"
-            }`}
+            className={`h-2 rounded-full transition-all duration-300 ${dotIndex === currentIndex
+              ? "bg-red-600 w-8"
+              : "bg-white/30 w-2 hover:bg-white/50"
+              }`}
             aria-label={`Go to slide ${dotIndex + 1}`}
           />
         ))}
@@ -178,7 +181,7 @@ export default function ParallaxCarousel({ list }) {
   );
 }
 
-function CarouselCard({ media, index, distance, isVisible, slidesPerView }) {
+function CarouselCard({ media, index, distance, isVisible, isEdgeBlur, slidesPerView }) {
   // Animazioni smooth con spring physics
   const scale = useSpring(1, { stiffness: 300, damping: 30 });
   const opacity = useSpring(1, { stiffness: 300, damping: 30 });
@@ -186,6 +189,7 @@ function CarouselCard({ media, index, distance, isVisible, slidesPerView }) {
   const y = useSpring(0, { stiffness: 300, damping: 30 });
 
   useEffect(() => {
+    // Card non visibile (fuori dal range di 1 card a sinistra/destra)
     if (!isVisible) {
       scale.set(0.7);
       opacity.set(0);
@@ -203,18 +207,18 @@ function CarouselCard({ media, index, distance, isVisible, slidesPerView }) {
       else if (distance === 1) {
         scale.set(0.9);
         opacity.set(0.7);
-        blur.set(2);
+        blur.set(isEdgeBlur ? 8 : 0);
         y.set(10);
       }
       // Card ai bordi
       else {
         scale.set(0.85);
         opacity.set(0.5);
-        blur.set(3);
+        blur.set(isEdgeBlur ? 8 : 0);
         y.set(15);
       }
     }
-  }, [distance, isVisible, scale, opacity, blur, y]);
+  }, [distance, isVisible, isEdgeBlur, scale, opacity, blur, y]);
 
   const blurValue = useTransform(blur, (value) => `blur(${value}px)`);
 
@@ -237,7 +241,6 @@ function CarouselCard({ media, index, distance, isVisible, slidesPerView }) {
       }}
       className="px-2"
       whileHover={distance === 0 ? {
-        scale: 1.05,
         transition: { duration: 0.3 }
       } : {}}
     >

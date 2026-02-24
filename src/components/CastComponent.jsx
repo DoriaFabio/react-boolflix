@@ -9,7 +9,7 @@ function CastComponent({ cast, onActorClick }) {
                         className="min-w-[120px] snap-start group cursor-pointer"
                         onClick={() => onActorClick(p)}
                     >
-                        <div className="w-[120px] h-[170px] bg-neutral-800 rounded-lg overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
+                        <div className="w-[120px] h-[170px] bg-neutral-800 rounded-lg overflow-hidden transition-all duration-300 group-hover:shadow-white/30 group-hover:shadow-lg">
                             {p.profile_path ? (
                                 <img
                                     src={`https://image.tmdb.org/t/p/w200${p.profile_path}`}

@@ -5,12 +5,13 @@ import HeroDetail from "../components/HeroDetail";
 import CastComponent from "../components/CastComponent";
 import DirectorMoviesOverlay from "../components/DirectorMoviesOverlay";
 import ActorOverlay from "../components/ActorOverlay";
+import CollectionOverlay from "../components/CollectionOverlay";
 import { FiStar } from "react-icons/fi";
 import Recommend from "../components/Recommend";
 
 function DetailPage() {
   const { id, type } = useParams();
-  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites, fetchMoviesByDirector, fetchByWatch, fetchPerson } = useGlobalContext();
+  const { fetchById, addToWatchlist, removeFromWatchlist, isInWatchlist, isInFavourites, addToFavourites, removeFromFavourites, fetchMoviesByDirector, fetchByWatch, fetchPerson, fetchCollection } = useGlobalContext();
   const [details, setDetails] = useState(null);
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,7 @@ function DetailPage() {
   const [selectedDirector, setSelectedDirector] = useState(null);
   const [showActorOverlay, setShowActorOverlay] = useState(false);
   const [selectedActor, setSelectedActor] = useState(null);
+  const [showCollectionOverlay, setShowCollectionOverlay] = useState(false);
 
   useEffect(() => {
     async function loadDetails() {
@@ -76,7 +78,7 @@ function DetailPage() {
 
   //!  stato watchlist calcolato con il context
   const inList = isInWatchlist(type, details.id);
-  const inList2 = isInFavourites(type, details.id); 
+  const inList2 = isInFavourites(type, details.id);
   const handleToggleWatchlist = () => {
     if (inList) removeFromWatchlist(type, details.id);
     else addToWatchlist(details);
@@ -95,6 +97,10 @@ function DetailPage() {
   const handleActorClick = (actor) => {
     setSelectedActor(actor);
     setShowActorOverlay(true);
+  };
+
+  const handleCollectionClick = () => {
+    setShowCollectionOverlay(true);
   };
 
   return (
@@ -135,6 +141,7 @@ function DetailPage() {
                 <span className="text-sm text-gray-300">
                   {details.vote_average?.toFixed(1)} / 10
                 </span>
+                <span className="text-sm text-gray-500">({details.vote_count} votes)</span>
               </div>
 
               {details.overview && (
@@ -173,6 +180,7 @@ function DetailPage() {
                 {type === "tv" && <p><strong>Seasons:</strong> {details.number_of_seasons ?? "—"}</p>}
                 <p><strong>Languages:</strong> {details.spoken_languages?.map((l) => l.english_name).join(", ") || "—"}</p>
                 <p><strong>Production:</strong> {details.production_companies?.map((p) => p.name).join(", ") || "—"}</p>
+                <p><strong>Streaming:</strong> {results?.results?.IT?.flatrate?.map((r) => r.provider_name).join(", ") || "—"}</p>
                 {typeof details.budget === "number" && details.budget > 0 && (
                   <p><strong>Budget:</strong> ${details.budget.toLocaleString()}</p>
                 )}
@@ -181,7 +189,18 @@ function DetailPage() {
                     <strong>Revenue:</strong> ${details.revenue.toLocaleString()}
                   </p>
                 )}
-                <p><strong>Streaming:</strong> {results?.results?.IT?.flatrate?.map((r) => r.provider_name).join(", ") || "—"}</p>
+                {details.belongs_to_collection && (
+                  <p>
+                    <strong>Collection:</strong>{" "}
+                    <button
+                      type="button"
+                      onClick={handleCollectionClick}
+                      className="text-red-500 hover:text-red-400 underline transition-colors cursor-pointer"
+                    >
+                      {details.belongs_to_collection.name}
+                    </button>
+                  </p>
+                )}
                 {type === "movie" && (
                   <p>
                     <strong>Director:</strong>{" "}
@@ -223,6 +242,14 @@ function DetailPage() {
         onClose={() => setShowActorOverlay(false)}
         actor={selectedActor}
         fetchPerson={fetchPerson}
+      />
+
+      {/* Overlay per la collezione */}
+      <CollectionOverlay
+        isOpen={showCollectionOverlay}
+        onClose={() => setShowCollectionOverlay(false)}
+        collection={details?.belongs_to_collection}
+        fetchCollection={fetchCollection}
       />
     </div>
   );

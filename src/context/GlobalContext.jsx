@@ -1,6 +1,7 @@
 import { useContext, createContext, useState, useEffect, useCallback } from "react";
 import useLocalStorageList from "../hooks/useLocalStorageList";
 import useSearch from "../hooks/useSearch";
+import useOverlay from "../hooks/useOverlay";
 
 /* =====================================================
   ! CONFIG / COSTANTI
@@ -46,6 +47,13 @@ const GlobalProvider = ({ children }) => {
     isInList: isInFavourites,
     getList: getFavourite,
   } = useLocalStorageList("favourites");
+
+  //todo Hook per overlay (funzioni per caricare dati specifici per overlay attore, regista, collezione)
+  const {
+    fetchMoviesByDirector,
+    fetchCollection,
+    fetchPerson,  
+  } = useOverlay();
 
   //! Caricamento iniziale dei popolari
   useEffect(() => {
@@ -97,36 +105,6 @@ const GlobalProvider = ({ children }) => {
     }
   }, []);
 
-  /**
-   *! fetchMoviesByDirector
-   *todo Recupera tutti i film diretti da un regista specifico dato il suo ID.
-   *? @param {number} directorId - ID del regista su TMDB
-   *? @returns {Promise<Array>} - Array di film diretti dal regista
-   */
-  const fetchMoviesByDirector = useCallback(async (directorId) => {
-    try {
-      const url = `${apiUrl}person/${directorId}/movie_credits?api_key=${apiKey}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Errore nella risposta: ${res.status}`);
-      const data = await res.json();
-
-      // Filtra solo i film dove la persona è regista (job: "Director")
-      const directedMovies = (data.crew || [])
-        .filter((item) => item.job === "Director")
-        .sort((a, b) => {
-          // Ordina per data di uscita (più recenti prima)
-          const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
-          const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
-          return dateB - dateA;
-        });
-      console.log(`Caricati ${directedMovies.length} film diretti dal regista ID: ${directorId}`);
-      return directedMovies;
-    } catch (error) {
-      console.error("Errore nel caricamento dei film del regista:", error);
-      return [];
-    }
-  }, []);
-
   //! fetchByWatch
   //todo Recupera i provider di visione per un media specifico
   //? @param {"movie"|"tv"} endpoint
@@ -146,18 +124,6 @@ const GlobalProvider = ({ children }) => {
     }
   }, []);
 
-  const fetchPerson = useCallback(async (personId) => {
-    try {
-      const url = `${apiUrl}person/${personId}?api_key=${apiKey}&append_to_response=movie_credits,tv_credits`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Errore nella risposta del server");
-      const data = await res.json();
-      console.log(`Caricati dettagli per persona ID: ${personId}`);
-      return data;
-    } catch (err) {
-      console.error("Errore nel caricamento dell'attore:", err);
-    }
-  }, [])
 
   /* =========================================================
     ! VALORE ESPORTATO DAL CONTESTO
@@ -173,8 +139,11 @@ const GlobalProvider = ({ children }) => {
     search,
     getPopular,
     fetchById,
-    fetchMoviesByDirector,
     fetchByWatch,
+
+    //todo Overlay API (dal custom hook)
+    fetchMoviesByDirector,
+    fetchCollection,
     fetchPerson,
 
     //todo Watchlist API (dal custom hook)
