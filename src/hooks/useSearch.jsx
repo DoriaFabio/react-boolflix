@@ -21,7 +21,7 @@ export default function useSearch() {
             const data = await res.json();
             //! Filtra solo i risultati con genere non documentario (ID 99)
             const filteredResults = (data.results || []).filter(item =>
-                !item.genre_ids || !item.genre_ids.includes(99)
+                item.genre_ids?.length > 0 && !item.genre_ids.includes(99)
             );
             if (endpoint === "movie") {
                 setMovies(filteredResults);
@@ -79,12 +79,13 @@ export default function useSearch() {
                 })
             );
 
-            //* 3) Elimina duplicati da un array di oggetti basandosi sull'id e filtra i documentari (ID 99)
+            //* 3) Elimina duplicati da un array di oggetti basandosi sull'id e filtra per escludere documentari, reality, talk show e news
+            const genresToExclude = [99, 10767, 10764, 10763]; // Documentari, Reality, Talk Show, News
             const uniqueMovies = Array.from(new Map(movieItems.map((m) => [m.id, m])).values()).filter(m =>
-                !m.genre_ids || !m.genre_ids.includes(99)
+                m.genre_ids?.length > 0 && !m.genre_ids.some(g => genresToExclude.includes(g))
             );
             const uniqueTv = Array.from(new Map(tvItems.map((t) => [t.id, t])).values()).filter(t =>
-                !t.genre_ids || !t.genre_ids.includes(99)
+                t.genre_ids?.length > 0 && !t.genre_ids.some(g => genresToExclude.includes(g))
             );
 
             //* 4) Merge con stato esistente (evita duplicati)

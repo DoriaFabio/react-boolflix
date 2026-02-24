@@ -90,7 +90,7 @@ function ActorOverlay({ isOpen, onClose, actor, fetchPerson }) {
     const genereIdsToExclude = [10767, 10764, 10763, 99]; // Reality, Talk Show, News, Documentaries
 
     const allCredits = [...movies, ...tvShows]
-      .filter((c) => !c.genre_ids?.some(g => genereIdsToExclude.includes(g)))
+      .filter((c) => c.genre_ids?.length > 0 && !c.genre_ids.some(g => genereIdsToExclude.includes(g)))
       .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
       .slice(0, 10);
 
