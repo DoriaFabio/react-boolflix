@@ -41,7 +41,7 @@ export default function CardMovies({ media }) {
 
   return (
     <Link to={`/${type}/${media.id}`}>
-      <div className={`${style.cardImg} relative bg-gray-800 rounded-2xl overflow-hidden shadow-lg`}>
+      <div className={`${style.cardImg} relative bg-gray-800 overflow-hidden shadow-lg`}>
         <img
           src={imageUrl}
           alt={media.title || media.name}

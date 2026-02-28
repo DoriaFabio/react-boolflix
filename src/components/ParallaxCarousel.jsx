@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform, animate } from "framer-motion";
 import CardMovies from "./CardMovies";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
@@ -42,30 +42,42 @@ export default function ParallaxCarousel({ list }) {
   }, [currentIndex, slidesPerView, x]);
 
   // Gestione click frecce e swipe
-  const handleNext = () => {
+  const isTouchDevice = windowWidth <= 768;
+
+  const handleNext = useCallback(() => {
     setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
-  };
+  }, [maxIndex]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
+  }, []);
+
+  // Navigazione con tasti freccia (solo desktop > 768px)
+  useEffect(() => {
+    if (isTouchDevice) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") handleNext();
+      else if (e.key === "ArrowLeft") handlePrev();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isTouchDevice, handleNext, handlePrev]);
+
+  const handleDragEnd = (_, info) => {
+    const threshold = 50;
+    const velocity = info.velocity.x;
+    const offset = info.offset.x;
+
+    if (offset < -threshold || velocity < -500) {
+      if (currentIndex < maxIndex) {
+        setCurrentIndex(currentIndex + 1);
+      }
+    } else if (offset > threshold || velocity > 500) {
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      }
+    }
   };
-
-  // Gestione swipe con threshold e velocity
-  // const handleDragEnd = (event, info) => {
-  //   const threshold = 50;
-  //   const velocity = info.velocity.x;
-  //   const offset = info.offset.x;
-
-  //   if (offset < -threshold || velocity < -500) {
-  //     if (currentIndex < maxIndex) {
-  //       setCurrentIndex(currentIndex + 1);
-  //     }
-  //   } else if (offset > threshold || velocity > 500) {
-  //     if (currentIndex > 0) {
-  //       setCurrentIndex(currentIndex - 1);
-  //     }
-  //   }
-  // };
 
   // Calcola quali dots mostrare in mobile
   const getVisibleDots = () => {
@@ -131,6 +143,10 @@ export default function ParallaxCarousel({ list }) {
           style={{
             x: useTransform(x, (value) => `${value}%`)
           }}
+          drag={isTouchDevice ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.1}
+          onDragEnd={isTouchDevice ? handleDragEnd : undefined}
         >
           {list.map((media, index) => {
             const relativePosition = index - currentIndex;
