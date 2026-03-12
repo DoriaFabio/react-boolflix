@@ -1,27 +1,57 @@
-import { useGlobalContext } from "../context/GlobalContext"
-import ListMedia from "../components/ListMedia"
+import { useState } from "react";
+import { useGlobalContext } from "../context/GlobalContext";
+import ListMedia from "../components/ListMedia";
 import HandleSearch from "../components/handleSearch";
+import GenreSelect, { GENRES } from "../components/GenreSelect";
+import CarouselSkeleton from "../components/CarouselSkeleton";
 
 function Homepage() {
-  const { movies, series, isSearching, popular } = useGlobalContext();
-  console.log(movies);
-  console.log(series);
+  const { movies, series, isSearching, popular, getPopular } = useGlobalContext();
+  const [selectedGenre, setSelectedGenre] = useState(GENRES[0]);
 
-  //! Se i dati popolari non sono ancora arrivati
+  const handleGenreChange = (e) => {
+    const genre = GENRES.find((g) => String(g.id) === e.target.value);
+    setSelectedGenre(genre);
+    getPopular(genre.id);
+  };
+
+  // throw new Error("test 500") // ← decommentare per testare la pagina 500, poi rimuovere
+
   if (!popular || popular.length === 0) {
     return (
-      <main className="flex flex-col items-center text-white mt-10">
+      <main className="mx-5 py-5 flex flex-col items-center">
         <HandleSearch />
-        <p className="text-gray-400 mt-10">Loading popular movies...</p>
+        <CarouselSkeleton count={6} />
       </main>
     );
   }
 
+  const listTitle = selectedGenre.id
+    ? `Popular · ${selectedGenre.name}`
+    : "Popular movies";
+
   return (
     <main className="mx-5 py-5 flex flex-col items-center">
       <HandleSearch />
+
       {!isSearching ? (
-        <ListMedia title="Popular movie" list={popular} />
+        <>
+          {/* Su mobile: select sotto la barra di ricerca */}
+          <div className="mt-4 w-[90%] md:hidden">
+            <GenreSelect value={selectedGenre.id} onChange={handleGenreChange} />
+          </div>
+
+          {/* Su tablet/desktop: select accanto al titolo (large) */}
+          <ListMedia
+            title={listTitle}
+            list={popular}
+            action={
+              <div className="hidden md:block">
+                <GenreSelect value={selectedGenre.id} onChange={handleGenreChange} large />
+              </div>
+            }
+          />
+        </>
       ) : (
         <>
           <ListMedia title="Movies" list={movies} />

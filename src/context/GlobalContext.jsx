@@ -65,10 +65,13 @@ const GlobalProvider = ({ children }) => {
      ============================================ */
   /**
    *! getPopular
-   *todo Recupera i film popolari (prima schermata/landing).
+   *todo Recupera i film popolari, opzionalmente filtrati per genere.
+   *? @param {number|null} genreId - ID del genere TMDB (null = tutti)
    */
-  function getPopular() {
-    const urlPopular = `${apiUrl}movie/popular?api_key=${apiKey}`;
+  function getPopular(genreId = null) {
+    const urlPopular = genreId
+      ? `${apiUrl}discover/movie?api_key=${apiKey}&sort_by=popularity.desc&with_genres=${genreId}`
+      : `${apiUrl}movie/popular?api_key=${apiKey}`;
 
     fetch(urlPopular)
       .then((res) => {

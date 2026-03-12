@@ -8,20 +8,25 @@ import { GlobalProvider } from "./context/GlobalContext"
 import WatchlistPage from './pages/Watchlist';
 import Favourites from './pages/Favourites';
 import Homepage from './pages/Homepage'
+import NotFound from './pages/NotFound'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
 
   return (
     <GlobalProvider>
       <BrowserRouter>
-        <Routes>
-          <Route Component={DefaultLayout}>
-            <Route path='/' Component={Homepage} />
-            <Route path='/:type/:id' Component={DetailPage} />
-            <Route path='/watchlist' Component={WatchlistPage}/>
-            <Route path='/favourites' Component={Favourites}/>
-          </Route>
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route Component={DefaultLayout}>
+              <Route path='/' Component={Homepage} />
+              <Route path='/:type/:id' Component={DetailPage} />
+              <Route path='/watchlist' Component={WatchlistPage}/>
+              <Route path='/favourites' Component={Favourites}/>
+              <Route path='*' Component={NotFound}/>
+            </Route>
+          </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </GlobalProvider>
   )
