@@ -78,8 +78,14 @@ function DirectorMoviesOverlay({ isOpen, onClose, director, fetchMoviesByDirecto
         {/* Content */}
         <div className="overflow-y-auto max-h-[calc(80vh-88px)] p-6">
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-400 text-lg">Loading...</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="w-full aspect-[2/3] bg-neutral-700 rounded-lg" />
+                  <div className="h-3 bg-neutral-700 rounded mt-2 w-3/4" />
+                  <div className="h-3 bg-neutral-800 rounded mt-1 w-1/3" />
+                </div>
+              ))}
             </div>
           ) : movies.length === 0 ? (
             <div className="text-center py-12">

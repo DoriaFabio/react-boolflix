@@ -13,7 +13,7 @@ export default function ServerError() {
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/50" />
       <p className="relative text-8xl font-black text-red-600 mb-4 rotate-[30deg]">500</p>
       <h1 className="relative text-3xl font-bold mb-2 rotate-[4deg]">Something went wrong</h1>
       <p className="relative text-gray-300 mb-8 max-w-md font-bold rotate-[-3deg]">

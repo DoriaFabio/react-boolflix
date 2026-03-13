@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform, animate } from "framer-motion";
-import CardMovies from "./CardMovies";
+import CardMovies from "./CardCarousel";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 export default function ParallaxCarousel({ list }) {

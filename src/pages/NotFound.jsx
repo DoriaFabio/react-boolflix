@@ -12,7 +12,7 @@ export default function NotFound() {
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}>
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/50" />
       <p className="relative text-8xl font-black text-red-600 mb-4">404</p>
       <h1 className="relative text-3xl font-bold mb-2">Page not found</h1>
       <p className="relative text-gray-300 mb-8 max-w-md font-bold">
