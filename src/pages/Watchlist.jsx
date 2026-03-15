@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useGlobalContext } from "../context/GlobalContext";
-import MediaGrid from "../components/MediaGrid";
+import WatchFavGrid from "../components/WatchFavGrid";
 
 function WatchlistPage() {
   const { watchlist, removeFromWatchlist } = useGlobalContext();
@@ -10,7 +10,7 @@ function WatchlistPage() {
   }, [watchlist]);
 
   return (
-    <MediaGrid
+    <WatchFavGrid
       title="Watchlist"
       emptyMessage="Your watchlist is empty"
       items={items}

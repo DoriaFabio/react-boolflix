@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { FiFilm } from "react-icons/fi";
 import MediaCard from "./MediaCard";
 
-function MediaGrid({ title, emptyMessage, items, onRemove }) {
+function WatchFavGrid({ title, emptyMessage, items, onRemove }) {
   if (!items.length) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-16 text-white text-center">
@@ -36,4 +36,4 @@ function MediaGrid({ title, emptyMessage, items, onRemove }) {
   );
 }
 
-export default MediaGrid;
+export default WatchFavGrid;
